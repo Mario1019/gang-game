@@ -42,6 +42,12 @@ function NightScreen({
 
   ] = useState(30);
 
+  const [isSecondaryPhase, setIsSecondaryPhase] = useState(false);
+
+  const [secondaryRoleData, setSecondaryRoleData] = useState(null);
+
+  const [targetPlayer, setTargetPlayer] = useState(null);
+
   /*========================لو اللاعب الحالياستخدم قدرته========================*/
 
   const oneTimeAbilityUsed =
@@ -54,87 +60,139 @@ function NightScreen({
       ?.oneTimeUsed ===
     true;
 
-  /*========================هل اللاعب الحاليمتحكم فيه؟========================*/
+  /*========================هل اللاعب الحالي متحكم فيه؟========================*/
 
   /*
   ========================
   سيد بشرية
   ========================
-*/
+  */
 
-const currentPlayerHijacked =
+  const currentPlayerHijacked =
+    stolenRoles.find(
+      (action) =>
 
-  stolenRoles.find(
-    (action) =>
-
-      action.target ===
-      currentTurnPlayer
-        ?.playerName &&
-
-      !action.alreadyPlayed
-  );
-
-/*
-  ========================
-  شعبطة
-  ========================
-*/
-
-const sha3bataCopyAction =
-
-  nightActions.find(
-    (action) =>
-
-      action.action ===
-        "copyResult" &&
-
-      action.target ===
+        action.target ===
         currentTurnPlayer
           ?.playerName &&
 
-      !action.alreadyPlayed
-  );
+        !action.alreadyPlayed
+    );
 
-/*
+  /*
   ========================
-  هل الدور مسروق؟
+  شعبطة
   ========================
-*/
+  */
 
-const roleHijacked =
+  const sha3bataCopyAction =
+    nightActions.find(
+      (action) =>
 
-  currentPlayerHijacked ||
-  sha3bataCopyAction;
+        action.action ===
+        "copyResult" &&
 
-/*
+        action.target ===
+        currentTurnPlayer
+          ?.playerName &&
+
+        !action.alreadyPlayed
+    );
+
+  /*
+  ========================
+  هل الدور متحكم فيه؟
+  ========================
+  */
+
+  const roleHijacked =
+    currentPlayerHijacked;
+
+  /*
   ========================
   مين المتحكم الحقيقي؟
   ========================
-*/
+  */
 
-let controllerPlayer =
-  currentTurnPlayer;
+  let controllerPlayer =
+    currentTurnPlayer;
 
-/*
+  /*
+  ========================
+  مين صاحب الدور الحقيقي؟
+  ========================
+  */
+
+  let roleOwnerPlayer =
+    currentTurnPlayer;
+
+  /*
+  ========================
   سيد بشرية / شعبطة
-*/
+  ========================
+  */
 
-if (roleHijacked) {
+  if (currentPlayerHijacked) {
 
-  const hijacker =
-    nightPlayers.find(
-      (player) =>
+    const hijacker =
+      nightPlayers.find(
+        (player) =>
 
-        player.playerName ===
-        roleHijacked.actor
-    );
+          player.playerName ===
+          roleHijacked.actor
+      );
 
-  if (hijacker) {
+    if (hijacker) {
 
-    controllerPlayer =
-      hijacker;
+      controllerPlayer =
+        hijacker;
+    }
   }
-}
+
+  /*
+  ========================
+  هل الحالي هو الضحية؟
+  ========================
+  */
+
+  const isVictimTurn =
+    currentPlayerHijacked &&
+    currentTurnPlayer
+      ?.playerName ===
+    currentPlayerHijacked
+      ?.target;
+
+  /*
+  ========================
+  هل الحالي هو سيد نفسه؟
+  ========================
+  */
+
+  const isSayedPlaying =
+    currentPlayerHijacked &&
+    controllerPlayer
+      ?.playerName ===
+    currentTurnPlayer
+      ?.playerName;
+
+  /*
+  ========================
+  لو شعبطة → اللاعب الحقيقي يكمل
+  لو سيد → سيد يلعب بداله
+  ========================
+  */
+
+  let effectivePlayer =
+
+    currentPlayerHijacked
+
+      ? controllerPlayer
+
+      : currentTurnPlayer;
+
+  if (secondaryRoleData) {
+    effectivePlayer = secondaryRoleData.player;
+  }
 
   /*========================مفاتن========================*/
 
@@ -228,6 +286,12 @@ if (roleHijacked) {
     setPressureTimer(
       pressureDuration
     );
+
+    setIsSecondaryPhase(false);
+
+    setSecondaryRoleData(null);
+
+    setTargetPlayer(null);
 
   }, [
 
@@ -378,7 +442,10 @@ if (roleHijacked) {
 
   /*========================اللاعب المسروق========================*/
 
-  if (roleHijacked) {
+  if (
+    isVictimTurn &&
+    controllerPlayer.realRole === "سيد بشرية"
+  ) {
 
     setTimeout(() => {
 
@@ -601,6 +668,10 @@ if (roleHijacked) {
 
   let role = currentTurnPlayer.realRole;
 
+  if (secondaryRoleData) {
+    role = secondaryRoleData.role;
+  }
+
   /*========================الشاشة الحالية========================*/
 
   const RoleScreen = roleScreens[role];
@@ -790,28 +861,45 @@ if (roleHijacked) {
             }}
           >
             {
-              controllerPlayer
-                .playerName
+              secondaryRoleData ? secondaryRoleData.player.playerName : controllerPlayer.playerName
             }
           </h2>
 
-          {roleHijacked && (
+          {(() => {
+            const isOriginal = secondaryRoleData && secondaryRoleData.player !== controllerPlayer;
+            const isStolen = secondaryRoleData || currentPlayerHijacked;
+            return isOriginal ? (
+              <p
+                style={{
+                  marginTop:
+                    "20px",
 
-            <p
-              style={{
-                marginTop:
-                  "20px",
+                  color:
+                    "crimson",
 
-                color:
-                  "crimson",
+                  fontSize:
+                    "24px",
+                }}
+              >
+                دورك الأصلي 😈
+              </p>
+            ) : isStolen ? (
+              <p
+                style={{
+                  marginTop:
+                    "20px",
 
-                fontSize:
-                  "24px",
-              }}
-            >
-              😈 دور مسروق
-            </p>
-          )}
+                  color:
+                    "crimson",
+
+                  fontSize:
+                    "24px",
+                }}
+              >
+                😈 دور مسروق
+              </p>
+            ) : null;
+          })()}
 
           <button
             onClick={() =>
@@ -916,7 +1004,7 @@ if (roleHijacked) {
 
             <RoleScreen
               currentPlayer={
-                currentTurnPlayer
+                effectivePlayer
               }
 
               allPlayers={
@@ -937,6 +1025,34 @@ if (roleHijacked) {
                     addNightAction(
                       ...args
                     );
+
+                    const action = args[0];
+
+                    if (
+                      action.action ===
+                      "steal" ||
+                      action.action ===
+                      "copy"
+                    ) {
+
+                      const tp =
+                        nightPlayers.find(
+                          (p) =>
+                            p.playerName ===
+                            action.target
+                        );
+
+                      setTargetPlayer(tp);
+
+                      setSecondaryRoleData({
+                        role: tp.realRole,
+                        player: controllerPlayer,
+                      });
+
+                      setShowRoleScreen(
+                        false
+                      );
+                    }
                   }
               }
 
@@ -945,11 +1061,15 @@ if (roleHijacked) {
               }
 
               roleOwner={
-                currentPlayerHijacked
-
-                  ? controllerPlayer
-                    .playerName
-
+                secondaryRoleData
+                  ? (
+                    secondaryRoleData.player ===
+                    controllerPlayer
+                      ? roleOwnerPlayer.playerName
+                      : null
+                  )
+                  : roleHijacked
+                  ? roleOwnerPlayer.playerName
                   : null
               }
             />
@@ -967,11 +1087,27 @@ if (roleHijacked) {
                   return;
                 }
 
-                setShowRoleScreen(
-                  false
-                );
-
-                goToNextPlayer();
+                if (secondaryRoleData) {
+                  if (
+                    controllerPlayer.realRole ===
+                    "شعبطة" &&
+                    secondaryRoleData.player.playerName ===
+                    controllerPlayer.playerName
+                  ) {
+                    setSecondaryRoleData({
+                      role: targetPlayer.realRole,
+                      player: targetPlayer,
+                    });
+                  } else {
+                    setSecondaryRoleData(null);
+                    setTargetPlayer(null);
+                  }
+                  setShowRoleScreen(false);
+                  goToNextPlayer();
+                } else {
+                  setShowRoleScreen(false);
+                  goToNextPlayer();
+                }
               }}
 
               disabled={
