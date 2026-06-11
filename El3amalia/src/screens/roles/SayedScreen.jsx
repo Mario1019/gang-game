@@ -1,9 +1,6 @@
-import { useMemo,
-useState }
-from "react";
+import { useMemo, useState } from "react";
 
 function SayedScreen({
-
   currentPlayer,
 
   allPlayers,
@@ -12,18 +9,9 @@ function SayedScreen({
 
   playedPlayers = [],
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    locked,
-
-    setLocked,
-  ] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   /*
     ========================
@@ -31,12 +19,9 @@ function SayedScreen({
     ========================
   */
 
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -44,122 +29,73 @@ function SayedScreen({
     ========================
   */
 
-  const randomPlayers =
-    useMemo(() => {
-
-      const shuffled =
-
-        [...availablePlayers]
-          .sort(
-            () =>
-              Math.random() - 0.5
-          );
-
-      /*
-        عدد عشوائي
-      */
-
-      const randomCount =
-
-        Math.max(
-
-          2,
-
-          Math.floor(
-            Math.random() *
-            shuffled.length
-          )
-        );
-
-      return shuffled.slice(
-        0,
-        randomCount
-      );
-
-    }, []);
-
   /*
     ========================
     الاختيار
     ========================
   */
 
-  const chooseTarget =
-    (player) => {
+  const chooseTarget = (player) => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    const alreadyPlayed = playedPlayers.includes(player.playerName);
 
-        return;
-      }
-
-      setSelectedPlayer(
-        player.playerName
-      );
+    if (alreadyPlayed) {
+      setSelectedPlayer(player.playerName);
 
       setLocked(true);
 
-      /*
+      return;
+    }
+
+    setSelectedPlayer(player.playerName);
+
+    setLocked(true);
+
+    /*
         تسجيل السرقة
       */
 
-      addNightAction({
+    addNightAction({
+      role: "سيد بشرية",
 
-        role:
-          "سيد بشرية",
+      actor: currentPlayer.playerName,
 
-        actor:
-          currentPlayer
-            .playerName,
+      target: player.playerName,
 
-        target:
-          player.playerName,
+      action: "stealRole",
 
-        action:
-          "stealRole",
-
-        /*
+      /*
           هل لعب بالفعل؟
         */
 
-        alreadyPlayed:
-
-          playedPlayers.includes(
-            player.playerName
-          ),
-      });
-    };
+      alreadyPlayed: playedPlayers.includes(player.playerName),
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         سيد بشرية 🥊
@@ -167,149 +103,90 @@ function SayedScreen({
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
 
-          lineHeight:
-            "1.8",
+          lineHeight: "1.8",
         }}
       >
         اختار لاعب…
         <br />
-        ويمكن الليلة
-        تبقى مكانه 😈
+        ويمكن الليلة تبقى مكانه 😈
       </p>
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => {
+          const alreadyPlayed = playedPlayers.includes(player.playerName);
 
-        {randomPlayers.map(
-          (
-            player,
-            index
-          ) => {
+          return (
+            <button
+              key={index}
+              disabled={locked}
+              onClick={() => chooseTarget(player)}
+              style={{
+                background:
+                  selectedPlayer === player.playerName
+                    ? "crimson"
+                    : alreadyPlayed
+                      ? "#1a1a1a"
+                      : "#111",
 
-            const alreadyPlayed =
+                border: "1px solid crimson",
 
-              playedPlayers.includes(
-                player.playerName
-              );
+                color: "white",
 
-            return (
+                padding: "20px",
 
-              <button
-                key={index}
+                borderRadius: "20px",
 
-                disabled={locked}
+                fontSize: "24px",
 
-                onClick={() =>
-                  chooseTarget(
-                    player
-                  )
-                }
+                cursor: "pointer",
 
-                style={{
-                  background:
+                opacity:
+                  locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+              }}
+            >
+              {player.playerName}
 
-                    selectedPlayer ===
-                    player.playerName
-
-                      ? "crimson"
-
-                      : alreadyPlayed
-
-                        ? "#1a1a1a"
-
-                        : "#111",
-
-                  border:
-                    "1px solid crimson",
-
-                  color:
-                    "white",
-
-                  padding:
-                    "20px",
-
-                  borderRadius:
-                    "20px",
-
-                  fontSize:
-                    "24px",
-
-                  cursor:
-                    "pointer",
-
-                  opacity:
-
-                    locked &&
-                    selectedPlayer !==
-                      player.playerName
-
-                      ? 0.45
-
-                      : 1,
-                }}
-              >
-                {
-                  player.playerName
-                }
-
-                {alreadyPlayed &&
-                  " 👁️"}
-              </button>
-            );
-          }
-        )}
+              {alreadyPlayed && " 👁️"}
+            </button>
+          );
+        })}
       </div>
 
       {selectedPlayer && (
-
         <div
           style={{
-            marginTop:
-              "45px",
+            marginTop: "45px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            background:
-              "#111",
+            background: "#111",
           }}
         >
-
           <p
             style={{
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
             }}
           >
             الهدف المختار
@@ -317,14 +194,11 @@ function SayedScreen({
 
           <h2
             style={{
-              marginTop:
-                "12px",
+              marginTop: "12px",
 
-              fontSize:
-                "40px",
+              fontSize: "40px",
 
-              color:
-                "crimson",
+              color: "crimson",
             }}
           >
             {selectedPlayer}
@@ -332,25 +206,16 @@ function SayedScreen({
 
           <p
             style={{
-              marginTop:
-                "15px",
+              marginTop: "15px",
 
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
             }}
           >
-            {
-              playedPlayers.includes(
-                selectedPlayer
-              )
-
+            {playedPlayers.includes(selectedPlayer)
               ? "👁️ لعب بالفعل"
-
-              : "🔥 دوره لسه مجاش"
-            }
+              : "🔥 دوره لسه مجاش"}
           </p>
         </div>
       )}

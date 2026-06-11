@@ -1,22 +1,13 @@
-import {
-  getAction,
-  getActions,
-}
-from "./actionHandlers";
+import { getAction, getActions } from "./actionHandlers";
 
-export function resolveNightActions(
-  nightActions,
-  playersState
-) {
+export function resolveNightActions(nightActions, playersState) {
+  let saherBulletConsumed = null;
 
-  let killedPlayer =
-    null;
+  let killedPlayer = null;
 
-  let arrestedPlayer =
-    null;
+  let arrestedPlayer = null;
 
-  let escapedPlayer =
-    null;
+  let escapedPlayer = null;
 
   /*
     ========================
@@ -24,14 +15,11 @@ export function resolveNightActions(
     ========================
   */
 
-  let failedPuzzlePlayer =
-    null;
+  let failedPuzzlePlayer = null;
 
-  let policeMessages =
-    [];
+  let policeMessages = [];
 
-  let policeSkipped =
-    false;
+  let policeSkipped = false;
 
   /*
     ========================
@@ -39,11 +27,9 @@ export function resolveNightActions(
     ========================
   */
 
-  let meetingTriggered =
-    false;
+  let meetingTriggered = false;
 
-  let meetingActor =
-    null;
+  let meetingActor = null;
 
   /*
     ========================
@@ -51,8 +37,7 @@ export function resolveNightActions(
     ========================
   */
 
-  let activeEffects =
-    [];
+  let activeEffects = [];
 
   /*
     ========================
@@ -60,8 +45,7 @@ export function resolveNightActions(
     ========================
   */
 
-  let resolvedActions =
-    [];
+  let resolvedActions = [];
 
   /*
     ========================
@@ -69,8 +53,7 @@ export function resolveNightActions(
     ========================
   */
 
-  let copiedResults =
-    [];
+  let copiedResults = [];
 
   /*
     ========================
@@ -78,17 +61,11 @@ export function resolveNightActions(
     ========================
   */
 
-  const officerPlayer =
+  const officerPlayer = playersState.find(
+    (player) => player.role === "تيسير بيه",
+  );
 
-    playersState.find(
-      (player) =>
-        player.role ===
-        "تيسير بيه"
-    );
-
-  const officerName =
-    officerPlayer
-      ?.playerName;
+  const officerName = officerPlayer?.playerName;
 
   /*
     ========================
@@ -96,23 +73,15 @@ export function resolveNightActions(
     ========================
   */
 
-  const cancelAction =
-    getAction(
-      nightActions,
-      "cancelRole"
-    );
+  const cancelAction = getAction(nightActions, "cancelRole");
 
   if (cancelAction) {
-
     activeEffects.push({
-
       type: "cancel",
 
-      source:
-        cancelAction.actor,
+      source: cancelAction.actor,
 
-      target:
-        cancelAction.target,
+      target: cancelAction.target,
     });
   }
 
@@ -122,17 +91,11 @@ export function resolveNightActions(
     ========================
   */
 
-  const stealAction =
-    getAction(
-      nightActions,
-      "stealRole"
-    );
+  const stealAction = getAction(nightActions, "stealRole");
 
-  const stolenPlayer =
-    stealAction?.target;
+  const stolenPlayer = stealAction?.target;
 
-  const stealActor =
-    stealAction?.actor;
+  const stealActor = stealAction?.actor;
 
   /*
     ========================
@@ -141,16 +104,9 @@ export function resolveNightActions(
   */
 
   policeMessages = [
+    ...getActions(nightActions, "intel"),
 
-    ...getActions(
-      nightActions,
-      "intel"
-    ),
-
-    ...getActions(
-      nightActions,
-      "stealIntel"
-    ),
+    ...getActions(nightActions, "stealIntel"),
   ];
 
   /*
@@ -159,24 +115,19 @@ export function resolveNightActions(
     ========================
   */
 
-  const houdaAction =
-    nightActions.find(
-      (action) =>
-        action.role ===
-        "حودة الغلبان"
-    );
+  let houdaSacrificePlayer = null;
+
+  const houdaAction = nightActions.find(
+    (action) => action.role === "حودة الغلبان",
+  );
 
   if (houdaAction) {
-
     activeEffects.push({
-
       type: "protect",
 
-      source:
-        houdaAction.actor,
+      source: houdaAction.actor,
 
-      target:
-        houdaAction.target,
+      target: houdaAction.target,
     });
   }
 
@@ -186,29 +137,29 @@ export function resolveNightActions(
     ========================
   */
 
-  const beboAction =
-    nightActions.find(
-      (action) =>
-        action.role ===
-        "بيبو ماجيفار"
-    );
+  const beboAction = nightActions.find(
+    (action) => action.role === "بيبو ماجيفار",
+  );
 
   if (beboAction) {
-
-    escapedPlayer =
-      beboAction.target;
+    escapedPlayer = beboAction.target;
 
     activeEffects.push({
-
       type: "escape",
 
-      source:
-        beboAction.actor,
+      source: beboAction.actor,
 
-      target:
-        beboAction.target,
+      target: beboAction.target,
     });
   }
+
+  /*
+  ========================
+  حمادة كلهم
+  ========================
+*/
+
+  const hamadaAction = getAction(nightActions, "sacrificeProtection");
 
   /*
     ========================
@@ -216,44 +167,20 @@ export function resolveNightActions(
     ========================
   */
 
-  const isCancelled =
-    (playerName) =>
+  const isCancelled = (playerName) =>
+    activeEffects.some(
+      (effect) => effect.type === "cancel" && effect.target === playerName,
+    );
 
-      activeEffects.some(
-        (effect) =>
+  const isProtected = (playerName) =>
+    activeEffects.some(
+      (effect) => effect.type === "protect" && effect.target === playerName,
+    );
 
-          effect.type ===
-            "cancel" &&
-
-          effect.target ===
-            playerName
-      );
-
-  const isProtected =
-    (playerName) =>
-
-      activeEffects.some(
-        (effect) =>
-
-          effect.type ===
-            "protect" &&
-
-          effect.target ===
-            playerName
-      );
-
-  const hasEscape =
-    (playerName) =>
-
-      activeEffects.some(
-        (effect) =>
-
-          effect.type ===
-            "escape" &&
-
-          effect.target ===
-            playerName
-      );
+  const hasEscape = (playerName) =>
+    activeEffects.some(
+      (effect) => effect.type === "escape" && effect.target === playerName,
+    );
 
   /*
     ========================
@@ -261,54 +188,34 @@ export function resolveNightActions(
     ========================
   */
 
-  const saherAction =
-    getAction(
-      nightActions,
-      "kill"
-    );
+  const saherAction = getAction(nightActions, "kill");
 
-  if (
-    saherAction &&
+  saherBulletConsumed = saherAction?.actor || null;
 
-    !isCancelled(
-      saherAction.actor
-    )
-  ) {
-
+  if (saherAction && !isCancelled(saherAction.actor)) {
     /*
       حماية العسكري للظابط
     */
 
     const protectedOfficer =
+      saherAction.target === officerName && isProtected(officerName);
 
-      saherAction.target ===
-        officerName &&
+    if (protectedOfficer) {
+      houdaSacrificePlayer = houdaAction.actor;
+    }
 
-      isProtected(
-        officerName
-      );
-
-    if (
-
-      !protectedOfficer &&
-
-      !hasEscape(
-        saherAction.target
-      )
-    ) {
-
-      killedPlayer =
-        saherAction.target;
-
+    if (!protectedOfficer && !hasEscape(saherAction.target)) {
+      if (hamadaAction && hamadaAction.target === saherAction.target) {
+        killedPlayer = hamadaAction.actor;
+      } else {
+        killedPlayer = saherAction.target;
+      }
       resolvedActions.push({
-
         type: "kill",
 
-        actor:
-          saherAction.actor,
+        actor: saherAction.actor,
 
-        target:
-          saherAction.target,
+        target: saherAction.target,
       });
     }
   }
@@ -319,71 +226,39 @@ export function resolveNightActions(
     ========================
   */
 
-  const taysirAction =
-    nightActions.find(
-      (action) =>
+  const taysirAction = nightActions.find(
+    (action) => action.action === "arrest" || action.action === "skipArrest",
+  );
 
-        action.action ===
-          "arrest" ||
-
-        action.action ===
-          "skipArrest"
-    );
-
-  if (
-    taysirAction &&
-
-    !isCancelled(
-      taysirAction.actor
-    )
-  ) {
-
-    if (
-      taysirAction.action ===
-      "arrest"
-    ) {
-
+  if (taysirAction && !isCancelled(taysirAction.actor)) {
+    if (taysirAction.action === "arrest") {
       /*
         هروب
       */
 
-      if (
-        !hasEscape(
-          taysirAction.target
-        )
-      ) {
-
-        arrestedPlayer =
-          taysirAction.target;
-
+      if (!hasEscape(taysirAction.target)) {
+        if (hamadaAction && hamadaAction.target === taysirAction.target) {
+          arrestedPlayer = hamadaAction.actor;
+        } else {
+          arrestedPlayer = taysirAction.target;
+        }
         resolvedActions.push({
-
           type: "arrest",
 
-          actor:
-            taysirAction.actor,
+          actor: taysirAction.actor,
 
-          target:
-            taysirAction.target,
+          target: taysirAction.target,
         });
       }
     }
 
-    if (
-      taysirAction.action ===
-      "skipArrest"
-    ) {
-
-      policeSkipped =
-        true;
+    if (taysirAction.action === "skipArrest") {
+      policeSkipped = true;
 
       resolvedActions.push({
+        type: "skipArrest",
 
-        type:
-          "skipArrest",
-
-        actor:
-          taysirAction.actor,
+        actor: taysirAction.actor,
       });
     }
   }
@@ -394,37 +269,21 @@ export function resolveNightActions(
     ========================
   */
 
-  const meetingAction =
-    getAction(
-      nightActions,
-      "triggerMeeting"
-    );
+  const meetingAction = getAction(nightActions, "triggerMeeting");
 
-  if (
-    meetingAction &&
-
-    !isCancelled(
-      meetingAction.actor
-    )
-  ) {
-
-    meetingTriggered =
-      true;
+  if (meetingAction && !isCancelled(meetingAction.actor)) {
+    meetingTriggered = true;
 
     /*
       صاحب الاجتماع
     */
 
-    meetingActor =
-      meetingAction.actor;
+    meetingActor = meetingAction.actor;
 
     resolvedActions.push({
+      type: "triggerMeeting",
 
-      type:
-        "triggerMeeting",
-
-      actor:
-        meetingAction.actor,
+      actor: meetingAction.actor,
     });
   }
 
@@ -434,24 +293,15 @@ export function resolveNightActions(
     ========================
   */
 
-  const failedPuzzleAction =
-    getAction(
-      nightActions,
-      "failedPuzzle"
-    );
+  const failedPuzzleAction = getAction(nightActions, "failedPuzzle");
 
   if (failedPuzzleAction) {
-
-    failedPuzzlePlayer =
-      failedPuzzleAction.actor;
+    failedPuzzlePlayer = failedPuzzleAction.actor;
 
     resolvedActions.push({
+      type: "failedPuzzle",
 
-      type:
-        "failedPuzzle",
-
-      actor:
-        failedPuzzleAction.actor,
+      actor: failedPuzzleAction.actor,
     });
   }
 
@@ -461,41 +311,25 @@ export function resolveNightActions(
     ========================
   */
 
-  const copyAction =
-    getAction(
-      nightActions,
-      "copyResult"
-    );
+  const copyAction = getAction(nightActions, "copyResult");
 
   if (copyAction) {
+    const copiedPlayer = copyAction.target;
 
-    const copiedPlayer =
-      copyAction.target;
-
-    const playerResults =
-
-      resolvedActions.filter(
-        (action) =>
-
-          action.actor ===
-          copiedPlayer
-      );
+    const playerResults = resolvedActions.filter(
+      (action) => action.actor === copiedPlayer,
+    );
 
     copiedResults.push({
+      watcher: copyAction.actor,
 
-      watcher:
-        copyAction.actor,
+      target: copiedPlayer,
 
-      target:
-        copiedPlayer,
-
-      results:
-        playerResults,
+      results: playerResults,
     });
   }
 
   return {
-
     killedPlayer,
 
     arrestedPlayer,
@@ -512,9 +346,13 @@ export function resolveNightActions(
 
     policeMessages,
 
+    saherBulletConsumed,
+
     policeSkipped,
 
     stolenPlayer,
+
+    houdaSacrificePlayer,
 
     stealActor,
 
@@ -528,11 +366,7 @@ export function resolveNightActions(
 
     meetingActor,
 
-    cancelledPlayer:
-      activeEffects.find(
-        (effect) =>
-          effect.type ===
-          "cancel"
-      )?.target,
+    cancelledPlayer: activeEffects.find((effect) => effect.type === "cancel")
+      ?.target,
   };
 }

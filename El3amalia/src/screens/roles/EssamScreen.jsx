@@ -1,71 +1,75 @@
-import {
-  useEffect,
-  useState,
-}
-from "react";
+import { useEffect, useState } from "react";
 
 function EssamScreen({
-
   currentPlayer,
 
   addNightAction,
 }) {
-
   /*
     ========================
     الشفرة الثابتة
     ========================
   */
 
-  const [
-    puzzle,
-  ] = useState(() => {
+  const [puzzle] = useState(() => {
+    const puzzleTypes = ["add", "subtract", "multiply", "sqrt"];
 
-    const firstNumber =
-      Math.floor(
-        Math.random() * 20
-      ) + 1;
+    const type = puzzleTypes[Math.floor(Math.random() * puzzleTypes.length)];
 
-    const secondNumber =
-      Math.floor(
-        Math.random() * 20
-      ) + 1;
+    if (type === "add") {
+      const a = Math.floor(Math.random() * 900) + 100;
+
+      const b = Math.floor(Math.random() * 900) + 100;
+
+      const c = Math.floor(Math.random() * 900) + 100;
+
+      return {
+        question: `${a} + ${b} + ${c}`,
+        correctAnswer: a + b + c,
+      };
+    }
+
+    if (type === "subtract") {
+      const a = Math.floor(Math.random() * 900) + 500;
+
+      const b = Math.floor(Math.random() * 200) + 50;
+
+      const c = Math.floor(Math.random() * 200) + 50;
+
+      return {
+        question: `${a} - ${b} - ${c}`,
+        correctAnswer: a - b - c,
+      };
+    }
+
+    if (type === "multiply") {
+      const a = Math.floor(Math.random() * 8) + 5;
+
+      const b = Math.floor(Math.random() * 8) + 5;
+
+      return {
+        question: `${a} × ${b}`,
+        correctAnswer: a * b,
+      };
+    }
+
+    const roots = [25, 36, 49, 64, 81, 100, 121, 144, 169, 225];
+
+    const value = roots[Math.floor(Math.random() * roots.length)];
 
     return {
-
-      firstNumber,
-
-      secondNumber,
-
-      correctAnswer:
-        firstNumber +
-        secondNumber,
+      question: `√${value}`,
+      correctAnswer: Math.sqrt(value),
     };
   });
 
-  const [
-    answer,
+  const [answer, setAnswer] = useState("");
 
-    setAnswer,
-  ] = useState("");
+  const [timeLeft, setTimeLeft] = useState(45);
 
-  const [
-    timeLeft,
+  const [gameOver, setGameOver] = useState(false);
 
-    setTimeLeft,
-  ] = useState(45);
-
-  const [
-    gameOver,
-
-    setGameOver,
-  ] = useState(false);
-
-  const [
-    message,
-
-    setMessage,
-  ] = useState("");
+  const [message, setMessage] = useState("");
 
   /*
     ========================
@@ -74,73 +78,42 @@ function EssamScreen({
   */
 
   useEffect(() => {
-
     if (gameOver) {
-
       return;
     }
 
-    const timer =
-      setInterval(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
 
-        setTimeLeft(
-          (prev) => {
-
-            if (prev <= 1) {
-
-              clearInterval(
-                timer
-              );
-
-              /*
+          /*
                 ========================
                 عبقرينو خسر
                 ========================
               */
 
-              addNightAction({
+          addNightAction({
+            role: "عصام عبقرينو",
 
-                role:
-                  "عصام عبقرينو",
+            actor: currentPlayer.playerName,
 
-                actor:
-                  currentPlayer
-                    .playerName,
+            action: "failedPuzzle",
+          });
 
-                action:
-                  "failedPuzzle",
-              });
+          setGameOver(true);
 
-              setGameOver(
-                true
-              );
+          setMessage("⛓️ عبقرينو وقع 😭");
 
-              setMessage(
-                "⛓️ عبقرينو وقع 😭"
-              );
+          return 0;
+        }
 
-              return 0;
-            }
+        return prev - 1;
+      });
+    }, 1000);
 
-            return prev - 1;
-          }
-        );
-
-      }, 1000);
-
-    return () =>
-      clearInterval(
-        timer
-      );
-
-  }, [
-
-    gameOver,
-
-    addNightAction,
-
-    currentPlayer,
-  ]);
+    return () => clearInterval(timer);
+  }, [gameOver, addNightAction, currentPlayer]);
 
   /*
     ========================
@@ -148,115 +121,75 @@ function EssamScreen({
     ========================
   */
 
-  const submitAnswer =
-    () => {
-
-      /*
+  const submitAnswer = () => {
+    /*
         ========================
         إجابة صح
         ========================
       */
 
-      if (
-        Number(answer) ===
-        puzzle.correctAnswer
-      ) {
+    if (Number(answer) === puzzle.correctAnswer) {
+      addNightAction({
+        role: "عصام عبقرينو",
 
-        addNightAction({
+        actor: currentPlayer.playerName,
 
-          role:
-            "عصام عبقرينو",
+        action: "solvePuzzle",
+      });
 
-          actor:
-            currentPlayer
-              .playerName,
+      setGameOver(true);
 
-          action:
-            "solvePuzzle",
-        });
-
-        setGameOver(
-          true
-        );
-
-        setMessage(
-          "🧠 عبقرينو فك الشفرة 😈"
-        );
-
-      } else {
-
-        /*
+      setMessage("🧠 عبقرينو فك الشفرة 😈");
+    } else {
+      /*
           ========================
           إجابة غلط
           ========================
         */
 
-        addNightAction({
+      addNightAction({
+        role: "عصام عبقرينو",
 
-          role:
-            "عصام عبقرينو",
+        actor: currentPlayer.playerName,
 
-          actor:
-            currentPlayer
-              .playerName,
+        action: "failedPuzzle",
+      });
 
-          action:
-            "failedPuzzle",
-        });
+      setGameOver(true);
 
-        setGameOver(
-          true
-        );
-
-        setMessage(
-          "💀 إجابة غلط… عبقرينو خرج 😭"
-        );
-      }
-    };
+      setMessage("💀 إجابة غلط… عبقرينو خرج 😭");
+    }
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        display:
-          "flex",
+        display: "flex",
 
-        flexDirection:
-          "column",
+        flexDirection: "column",
 
-        justifyContent:
-          "center",
+        justifyContent: "center",
 
-        alignItems:
-          "center",
+        alignItems: "center",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
 
-        padding:
-          "20px",
+        padding: "20px",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         عصام عبقرينو 🧠
@@ -264,35 +197,23 @@ function EssamScreen({
 
       <div
         style={{
-          marginTop:
-            "30px",
+          marginTop: "30px",
 
-          fontSize:
-            "90px",
+          fontSize: "90px",
 
-          color:
-
-            timeLeft <= 15
-
-              ? "crimson"
-
-              : "white",
+          color: timeLeft <= 15 ? "crimson" : "white",
         }}
       >
         {timeLeft}
       </div>
 
       {!gameOver ? (
-
         <>
-
           <p
             style={{
-              marginTop:
-                "20px",
+              marginTop: "20px",
 
-              fontSize:
-                "35px",
+              fontSize: "35px",
             }}
           >
             احسب بسرعة:
@@ -300,121 +221,76 @@ function EssamScreen({
 
           <h2
             style={{
-              marginTop:
-                "20px",
+              marginTop: "20px",
 
-              fontSize:
-                "65px",
+              fontSize: "65px",
             }}
           >
-            {
-              puzzle.firstNumber
-            }
-
-            {" + "}
-
-            {
-              puzzle.secondNumber
-            }
+            {puzzle.question}
           </h2>
 
           <input
             type="number"
-
             value={answer}
-
-            onChange={(e) =>
-              setAnswer(
-                e.target.value
-              )
-            }
-
+            onChange={(e) => setAnswer(e.target.value)}
             style={{
-              marginTop:
-                "40px",
+              marginTop: "40px",
 
-              padding:
-                "18px",
+              padding: "18px",
 
-              width:
-                "220px",
+              width: "220px",
 
-              borderRadius:
-                "18px",
+              borderRadius: "18px",
 
-              border:
-                "1px solid crimson",
+              border: "1px solid crimson",
 
-              background:
-                "#111",
+              background: "#111",
 
-              color:
-                "white",
+              color: "white",
 
-              fontSize:
-                "30px",
+              fontSize: "30px",
 
-              textAlign:
-                "center",
+              textAlign: "center",
 
-              outline:
-                "none",
+              outline: "none",
             }}
           />
 
           <button
-            onClick={
-              submitAnswer
-            }
-
+            onClick={submitAnswer}
             style={{
-              marginTop:
-                "35px",
+              marginTop: "35px",
 
-              background:
-                "crimson",
+              background: "crimson",
 
-              border:
-                "none",
+              border: "none",
 
-              color:
-                "white",
+              color: "white",
 
-              padding:
-                "18px 40px",
+              padding: "18px 40px",
 
-              borderRadius:
-                "20px",
+              borderRadius: "20px",
 
-              fontSize:
-                "24px",
+              fontSize: "24px",
 
-              cursor:
-                "pointer",
+              cursor: "pointer",
 
-              boxShadow:
-                "0 0 20px crimson",
+              boxShadow: "0 0 20px crimson",
             }}
           >
             فك الشفرة 🔓
           </button>
         </>
-
       ) : (
-
         <h2
           style={{
-            marginTop:
-              "40px",
+            marginTop: "40px",
 
-            fontSize:
-              "45px",
+            fontSize: "45px",
 
-            color:
-              "crimson",
+            color: "crimson",
 
-            lineHeight:
-              "1.8",
+            lineHeight: "1.8",
           }}
         >
           {message}

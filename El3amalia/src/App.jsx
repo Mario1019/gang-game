@@ -1,60 +1,39 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
-import SplashScreen
-from "./screens/SplashScreen";
+import SplashScreen from "./screens/SplashScreen";
 
-import SettingsScreen
-from "./screens/SettingsScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 
-import PlayersScreen
-from "./screens/PlayersScreen";
+import PlayersScreen from "./screens/PlayersScreen";
 
-import ReadyScreen
-from "./screens/ReadyScreen";
+import ReadyScreen from "./screens/ReadyScreen";
 
-import RoleRevealScreen
-from "./screens/RoleRevealScreen";
+import RoleRevealScreen from "./screens/RoleRevealScreen";
 
-import { resolveNightActions }
-from "./game/resolveNightActions";
+import { resolveNightActions } from "./game/resolveNightActions";
 
-import DiscussionScreen
-from "./screens/DiscussionScreen";
+import DiscussionScreen from "./screens/DiscussionScreen";
 
-import MorningScreen
-from "./screens/MorningScreen";
+import MorningScreen from "./screens/MorningScreen";
 
-import NightScreen
-from "./screens/NightScreen";
+import NightScreen from "./screens/NightScreen";
 
-import GameOverScreen
-from "./screens/GameOverScreen";
+import GameOverScreen from "./screens/GameOverScreen";
 
-import EmergencyMeetingScreen
-from "./screens/EmergencyMeetingScreen";
+import EmergencyMeetingScreen from "./screens/EmergencyMeetingScreen";
 
-import { prepareNightData }
-from "./game/prepareNightData";
+import { prepareNightData } from "./game/prepareNightData";
 
-import { distributeRoles }
-from "./game/roleDistribution";
+import { distributeRoles } from "./game/roleDistribution";
 
-import { checkWinConditions }
-from "./game/checkWinConditions";
+import { checkWinConditions } from "./game/checkWinConditions";
 
 function App() {
+  const [screen, setScreen] = useState("splash");
 
-  const [screen, setScreen] =
-    useState("splash");
+  const [playerCount, setPlayerCount] = useState(5);
 
-  const [playerCount,
-  setPlayerCount] =
-    useState(5);
-
-  const [discussionTime,
-  setDiscussionTime] =
-    useState(3);
+  const [discussionTime, setDiscussionTime] = useState(3);
 
   /*
     ========================
@@ -62,33 +41,19 @@ function App() {
     ========================
   */
 
-  const [players,
-  setPlayers] =
-    useState([]);
+  const [players, setPlayers] = useState([]);
 
-  const [playersState,
-  setPlayersState] =
-    useState([]);
+  const [playersState, setPlayersState] = useState([]);
 
-  const [assignedRoles,
-  setAssignedRoles] =
-    useState([]);
+  const [assignedRoles, setAssignedRoles] = useState([]);
 
-  const [nightPlayers,
-  setNightPlayers] =
-    useState([]);
+  const [nightPlayers, setNightPlayers] = useState([]);
 
-  const [currentNightIndex,
-  setCurrentNightIndex] =
-    useState(0);
+  const [currentNightIndex, setCurrentNightIndex] = useState(0);
 
-  const [nightActions,
-  setNightActions] =
-    useState([]);
+  const [nightActions, setNightActions] = useState([]);
 
-  const [stolenRoles,
-  setStolenRoles] =
-    useState([]);
+  const [stolenRoles, setStolenRoles] = useState([]);
 
   /*
     ========================
@@ -96,9 +61,7 @@ function App() {
     ========================
   */
 
-  const [meetingTriggered,
-  setMeetingTriggered] =
-    useState(false);
+  const [meetingTriggered, setMeetingTriggered] = useState(false);
 
   /*
     ========================
@@ -106,17 +69,11 @@ function App() {
     ========================
   */
 
-  const [playedPlayers,
-  setPlayedPlayers] =
-    useState([]);
+  const [playedPlayers, setPlayedPlayers] = useState([]);
 
-  const [nightResult,
-  setNightResult] =
-    useState(null);
+  const [nightResult, setNightResult] = useState(null);
 
-  const [gameResult,
-  setGameResult] =
-    useState(null);
+  const [gameResult, setGameResult] = useState(null);
 
   /*
     ========================
@@ -124,33 +81,17 @@ function App() {
     ========================
   */
 
-  const addNightAction =
-    (action) => {
-
-      /*
+  const addNightAction = (action) => {
+    /*
         سيد بشرية
       */
 
-      if (
-        action.action ===
-        "stealRole"
-      ) {
+    if (action.action === "stealRole") {
+      setStolenRoles((prev) => [...prev, action]);
+    }
 
-        setStolenRoles(
-          (prev) => [
-            ...prev,
-            action,
-          ]
-        );
-      }
-
-      setNightActions(
-        (prev) => [
-          ...prev,
-          action,
-        ]
-      );
-    };
+    setNightActions((prev) => [...prev, action]);
+  };
 
   /*
     ========================
@@ -158,67 +99,45 @@ function App() {
     ========================
   */
 
-  const startRoleDistribution =
-    () => {
+  const startRoleDistribution = () => {
+    const roles = distributeRoles(playerCount);
 
-      const roles =
-        distributeRoles(
-          playerCount
-        );
+    setAssignedRoles(roles);
 
-      setAssignedRoles(
-        roles
-      );
-
-      /*
+    /*
         أول Game State
       */
 
-      const initialPlayers =
+    const initialPlayers = players.map((player, index) => ({
+      playerName: player,
 
-        players.map(
-          (
-            player,
-            index
-          ) => ({
+      role: roles[index]?.realRole,
 
-            playerName:
-              player,
+      disguise: roles[index]?.disguise,
 
-            role:
-              roles[index]
-                ?.realRole,
+      alive: true,
 
-            disguise:
-              roles[index]
-                ?.disguise,
+      jailed: false,
 
-            alive: true,
+      muted: false,
 
-            jailed: false,
+      insane: false,
 
-            muted: false,
-
-            insane: false,
-
-            /*
+      /*
               ========================
               استخدامات خاصة
               ========================
             */
 
-            oneTimeUsed:
-              roles[index]
-                ?.oneTimeUsed,
-          })
-        );
+      bulletCount: 1,
 
-      setPlayersState(
-        initialPlayers
-      );
+      oneTimeUsed: roles[index]?.oneTimeUsed,
+    }));
 
-      setScreen("roles");
-    };
+    setPlayersState(initialPlayers);
+
+    setScreen("roles");
+  };
 
   /*
     ========================
@@ -227,55 +146,36 @@ function App() {
   */
 
   const startNight = () => {
-
     /*
       اللاعبين الأحياء فقط
     */
 
-    const alivePlayers =
+    const alivePlayers = playersState.filter((player) => player.alive);
 
-      playersState.filter(
-        (player) =>
+    const preparedPlayers = prepareNightData(
+      alivePlayers.map((player) => ({
+        playerName: player.playerName,
 
-          player.alive
-      );
+        realRole: player.role,
 
-    const preparedPlayers =
-      prepareNightData(
+        disguise: player.disguise,
 
-        alivePlayers.map(
-          (player) => ({
-            playerName:
-              player.playerName,
+        alive: player.alive,
 
-            realRole:
-              player.role,
-
-            disguise:
-              player.disguise,
-
-            alive:
-              player.alive,
-
-            /*
+        /*
               ========================
               الاستخدامات الخاصة
               ========================
             */
+        bulletCount: player.bulletCount,
 
-            oneTimeUsed:
-              player.oneTimeUsed,
-          })
-        )
-      );
-
-    setNightPlayers(
-      preparedPlayers
+        oneTimeUsed: player.oneTimeUsed,
+      })),
     );
 
-    setCurrentNightIndex(
-      0
-    );
+    setNightPlayers(preparedPlayers);
+
+    setCurrentNightIndex(0);
 
     setNightActions([]);
 
@@ -283,9 +183,7 @@ function App() {
 
     setPlayedPlayers([]);
 
-    setMeetingTriggered(
-      false
-    );
+    setMeetingTriggered(false);
 
     setScreen("night");
   };
@@ -296,65 +194,39 @@ function App() {
     ========================
   */
 
-  const eliminatePlayer =
-    (playerName) => {
+  const eliminatePlayer = (playerName) => {
+    const updatedPlayers = playersState.map((player) => {
+      if (player.playerName === playerName) {
+        return {
+          ...player,
 
-      const updatedPlayers =
+          alive: false,
+        };
+      }
 
-        playersState.map(
-          (player) => {
+      return player;
+    });
 
-            if (
-              player.playerName ===
-              playerName
-            ) {
+    setPlayersState(updatedPlayers);
 
-              return {
-
-                ...player,
-
-                alive: false,
-              };
-            }
-
-            return player;
-          }
-        );
-
-      setPlayersState(
-        updatedPlayers
-      );
-
-      /*
+    /*
         ========================
         Win Conditions
         ========================
       */
 
-      const winResult =
+    const winResult = checkWinConditions(updatedPlayers, nightResult);
 
-        checkWinConditions(
-          updatedPlayers,
-          nightResult
-        );
+    if (winResult) {
+      setGameResult(winResult);
 
-      if (winResult) {
+      setScreen("gameOver");
 
-        setGameResult(
-          winResult
-        );
+      return;
+    }
 
-        setScreen(
-          "gameOver"
-        );
-
-        return;
-      }
-
-      setScreen(
-        "discussion"
-      );
-    };
+    setScreen("discussion");
+  };
 
   /*
     ========================
@@ -362,450 +234,250 @@ function App() {
     ========================
   */
 
-  const goToNextNightPlayer =
-    () => {
+  const goToNextNightPlayer = () => {
+    console.log("CURRENT INDEX:", currentNightIndex);
 
-      /*
+    console.log("CURRENT PLAYER:", nightPlayers[currentNightIndex]?.playerName);
+    /*
         تسجيل اللاعب الحالي
       */
 
-      const currentPlayer =
+    const currentPlayer = nightPlayers[currentNightIndex];
 
-        nightPlayers[
-          currentNightIndex
-        ];
+    if (currentPlayer) {
+      setPlayedPlayers((prev) => [...prev, currentPlayer.playerName]);
+    }
 
-      if (currentPlayer) {
+    let nextIndex = currentNightIndex + 1;
 
-        setPlayedPlayers(
-          (prev) => [
+    while (nextIndex < nightPlayers.length) {
+      const nextPlayer = nightPlayers[nextIndex];
 
-            ...prev,
-
-            currentPlayer
-              .playerName,
-          ]
-        );
-      }
-
-      let nextIndex =
-        currentNightIndex + 1;
-
-      while (
-        nextIndex <
-        nightPlayers.length
-      ) {
-
-        const nextPlayer =
-          nightPlayers[
-            nextIndex
-          ];
-
-        /*
+      /*
           كريم كوشة
         */
 
-        const removedPlayer =
-          nightActions.find(
-            (action) =>
+      const removedPlayer = nightActions.find(
+        (action) =>
+          action.action === "removeFromNight" &&
+          action.target === nextPlayer?.playerName,
+      );
 
-              action.action ===
-                "removeFromNight" &&
-
-              action.target ===
-                nextPlayer
-                  ?.playerName
-          );
-
-        /*
+      /*
           سيد بشرية
         */
 
-        const stolenPlayer =
-          stolenRoles.find(
-            (action) =>
+      const stolenPlayer = stolenRoles.find(
+        (action) => action.target === nextPlayer?.playerName,
+      );
 
-              action.target ===
-                nextPlayer
-                  ?.playerName
-          );
-
-        /*
+      /*
           صبحي صيدلية
         */
 
-        const sobhyUsed =
+      const sobhyUsed =
+        nextPlayer?.realRole === "صبحي صيدلية" &&
+        nextPlayer?.oneTimeUsed === true;
 
-          nextPlayer
-            ?.realRole ===
-              "صبحي صيدلية" &&
-
-          nextPlayer
-            ?.oneTimeUsed ===
-              true;
-
-        /*
+      /*
           Skip
         */
 
-        if (
-          removedPlayer ||
-          stolenPlayer ||
-          sobhyUsed
-        ) {
-
-          nextIndex++;
-
-        } else {
-
-          break;
-        }
+      if (removedPlayer || sobhyUsed) {
+        nextIndex++;
+      } else {
+        break;
       }
+    }
 
-      /*
+    /*
         نهاية الليل
       */
 
-      if (
-        nextIndex >=
-        nightPlayers.length
-      ) {
+    if (nextIndex >= nightPlayers.length) {
+      const result = resolveNightActions(nightActions, playersState);
 
-        const result =
-          resolveNightActions(
-            nightActions,
-            playersState
-          );
-
-        /*
+      /*
           تحديث الحالات
         */
 
-        const updatedPlayersState =
+      const updatedPlayersState = playersState.map((player) => {
+        let updatedPlayer = {
+          ...player,
+        };
 
-          playersState.map(
-            (player) => {
+        /*
+        ========================
+            قتل
+        ========================
+        */
 
-              let updatedPlayer = {
+        if (player.playerName === result.saherBulletConsumed) {
+          updatedPlayer.bulletCount = 0;
+        }
 
-                ...player,
-              };
+        if (player.playerName === result.killedPlayer) {
+          updatedPlayer.alive = false;
+        }
 
-              /*
-                ========================
-                قتل
-                ========================
-              */
-
-              if (
-                player.playerName ===
-                result.killedPlayer
-              ) {
-
-                updatedPlayer.alive =
-                  false;
-              }
-
-              /*
+        /*
                 ========================
                 قبض
                 ========================
               */
 
-              if (
-                player.playerName ===
-                result.arrestedPlayer
-              ) {
+        if (player.playerName === result.arrestedPlayer) {
+          updatedPlayer.alive = false;
 
-                updatedPlayer.alive =
-                  false;
+          updatedPlayer.jailed = true;
+        }
 
-                updatedPlayer.jailed =
-                  true;
-              }
+        if (player.playerName === result.houdaSacrificePlayer) {
+          updatedPlayer.alive = false;
+        }
 
-              /*
+        /*
+  ========================
+  عبقرينو
+  ========================
+*/
+
+        if (player.playerName === result.failedPuzzlePlayer) {
+          updatedPlayer.alive = false;
+        }
+
+        /*
                 ========================
                 صبحي استخدم قدرته
                 ========================
               */
 
-              if (
-                player.playerName ===
-                result.meetingActor
-              ) {
+        if (player.playerName === result.meetingActor) {
+          updatedPlayer.oneTimeUsed = true;
+        }
 
-                updatedPlayer.oneTimeUsed =
-                  true;
-              }
+        return updatedPlayer;
+      });
 
-              return updatedPlayer;
-            }
-          );
+      setPlayersState(updatedPlayersState);
 
-        setPlayersState(
-          updatedPlayersState
-        );
+      setNightResult(result);
 
-        setNightResult(
-          result
-        );
-
-        /*
+      /*
           ========================
           اجتماع العصابة
           ========================
         */
 
-        if (
-          result.meetingTriggered
-        ) {
+      if (result.meetingTriggered) {
+        setMeetingTriggered(true);
+      }
 
-          setMeetingTriggered(
-            true
-          );
-        }
-
-        /*
+      /*
           ========================
           Win Conditions
           ========================
         */
 
-        const winResult =
+      const winResult = checkWinConditions(updatedPlayersState, result);
 
-          checkWinConditions(
-            updatedPlayersState,
-            result
-          );
+      if (winResult) {
+        setGameResult(winResult);
 
-        if (winResult) {
-
-          setGameResult(
-            winResult
-          );
-
-          setScreen(
-            "gameOver"
-          );
-
-          return;
-        }
-
-        setScreen(
-          "morning"
-        );
+        setScreen("gameOver");
 
         return;
       }
 
-      setCurrentNightIndex(
-        nextIndex
-      );
-    };
+      setScreen("morning");
+
+      return;
+    }
+
+    console.log("NEXT INDEX:", nextIndex);
+
+    console.log("NEXT PLAYER:", nightPlayers[nextIndex]?.playerName);
+
+    setCurrentNightIndex(nextIndex);
+  };
 
   return (
-
     <>
-
-      {screen ===
-        "splash" && (
-
-        <SplashScreen
-          goToSettings={() =>
-            setScreen(
-              "settings"
-            )
-          }
-        />
+      {screen === "splash" && (
+        <SplashScreen goToSettings={() => setScreen("settings")} />
       )}
 
-      {screen ===
-        "settings" && (
-
+      {screen === "settings" && (
         <SettingsScreen
-          playerCount={
-            playerCount
-          }
-
-          setPlayerCount={
-            setPlayerCount
-          }
-
-          discussionTime={
-            discussionTime
-          }
-
-          setDiscussionTime={
-            setDiscussionTime
-          }
-
-          goToPlayers={() =>
-            setScreen(
-              "players"
-            )
-          }
+          playerCount={playerCount}
+          setPlayerCount={setPlayerCount}
+          discussionTime={discussionTime}
+          setDiscussionTime={setDiscussionTime}
+          goToPlayers={() => setScreen("players")}
         />
       )}
 
-      {screen ===
-        "players" && (
-
+      {screen === "players" && (
         <PlayersScreen
-          playerCount={
-            playerCount
-          }
-
+          playerCount={playerCount}
           players={players}
-
-          setPlayers={
-            setPlayers
-          }
-
-          goToReady={() =>
-            setScreen(
-              "ready"
-            )
-          }
+          setPlayers={setPlayers}
+          goToReady={() => setScreen("ready")}
         />
       )}
 
-      {screen ===
-        "ready" && (
+      {screen === "ready" && <ReadyScreen startGame={startRoleDistribution} />}
 
-        <ReadyScreen
-          startGame={
-            startRoleDistribution
-          }
-        />
-      )}
-
-      {screen ===
-        "roles" && (
-
+      {screen === "roles" && (
         <RoleRevealScreen
           players={players}
-
-          assignedRoles={
-            assignedRoles
-          }
-
-          goToDiscussion={() =>
-            setScreen(
-              "discussion"
-            )
-          }
+          assignedRoles={assignedRoles}
+          goToDiscussion={() => setScreen("discussion")}
         />
       )}
 
-      {screen ===
-        "discussion" && (
-
+      {screen === "discussion" && (
         <DiscussionScreen
-          discussionTime={
-            discussionTime
-          }
-
-          goToNight={
-            startNight
-          }
+          discussionTime={discussionTime}
+          goToNight={startNight}
         />
       )}
 
-      {screen ===
-        "night" && (
-
+      {screen === "night" && (
         <NightScreen
-          currentTurnPlayer={
-            nightPlayers[
-              currentNightIndex
-            ]
-          }
-
-          nightPlayers={
-            nightPlayers
-          }
-
-          playedPlayers={
-            playedPlayers
-          }
-
-          goToNextPlayer={
-            goToNextNightPlayer
-          }
-
-          addNightAction={
-            addNightAction
-          }
-
-          nightActions={
-            nightActions
-          }
-
-          stolenRoles={
-            stolenRoles
-          }
+          currentTurnPlayer={nightPlayers[currentNightIndex]}
+          nightPlayers={nightPlayers}
+          playedPlayers={playedPlayers}
+          goToNextPlayer={goToNextNightPlayer}
+          addNightAction={addNightAction}
+          nightActions={nightActions}
+          stolenRoles={stolenRoles}
         />
       )}
 
-      {screen ===
-        "morning" && (
-
+      {screen === "morning" && (
         <MorningScreen
-          nightResult={
-            nightResult
-          }
-
-          meetingTriggered={
-            meetingTriggered
-          }
-
+          nightResult={nightResult}
+          meetingTriggered={meetingTriggered}
           goToDiscussion={() => {
-
-            if (
-              meetingTriggered
-            ) {
-
-              setScreen(
-                "meeting"
-              );
-
+            if (meetingTriggered) {
+              setScreen("meeting");
             } else {
-
-              setScreen(
-                "discussion"
-              );
+              setScreen("discussion");
             }
           }}
         />
       )}
 
-      {screen ===
-        "meeting" && (
-
+      {screen === "meeting" && (
         <EmergencyMeetingScreen
-          playersState={
-            playersState
-          }
-
-          eliminatePlayer={
-            eliminatePlayer
-          }
+          playersState={playersState}
+          eliminatePlayer={eliminatePlayer}
         />
       )}
 
-      {screen ===
-        "gameOver" && (
-
-        <GameOverScreen
-          gameResult={
-            gameResult
-          }
-
-          playersState={
-            playersState
-          }
-        />
+      {screen === "gameOver" && (
+        <GameOverScreen gameResult={gameResult} playersState={playersState} />
       )}
     </>
   );

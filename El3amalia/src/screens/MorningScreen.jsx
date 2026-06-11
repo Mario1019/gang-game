@@ -1,39 +1,23 @@
 function MorningScreen({
-
   nightResult,
 
   meetingTriggered,
 
   goToDiscussion,
 }) {
-
   /*
     ========================
     النتائج الحقيقية
     ========================
   */
 
-  const resolvedKill =
+  const resolvedKill = nightResult?.resolvedActions?.find(
+    (action) => action.type === "kill",
+  );
 
-    nightResult
-      ?.resolvedActions
-      ?.find(
-        (action) =>
-
-          action.type ===
-          "kill"
-      );
-
-  const resolvedArrest =
-
-    nightResult
-      ?.resolvedActions
-      ?.find(
-        (action) =>
-
-          action.type ===
-          "arrest"
-      );
+  const resolvedArrest = nightResult?.resolvedActions?.find(
+    (action) => action.type === "arrest",
+  );
 
   /*
     ========================
@@ -41,9 +25,7 @@ function MorningScreen({
     ========================
   */
 
-  let morningHeadline =
-
-    "📰 أخبار عاجلة: ليلة هادئة نسبيًا داخل الحارة";
+  let morningHeadline = "📰 أخبار عاجلة: ليلة هادئة نسبيًا داخل الحارة";
 
   /*
     ========================
@@ -52,10 +34,7 @@ function MorningScreen({
   */
 
   if (resolvedKill) {
-
-    morningHeadline =
-
-      `☠️ العثور على جثة ${resolvedKill.target}`;
+    morningHeadline = `☠️ العثور على جثة ${resolvedKill.target}`;
   }
 
   /*
@@ -65,10 +44,7 @@ function MorningScreen({
   */
 
   if (resolvedArrest) {
-
-    morningHeadline =
-
-      `🚔 تم القبض على ${resolvedArrest.target}`;
+    morningHeadline = `🚔 تم القبض على ${resolvedArrest.target}`;
   }
 
   /*
@@ -77,14 +53,8 @@ function MorningScreen({
     ========================
   */
 
-  if (
-    resolvedKill &&
-    resolvedArrest
-  ) {
-
-    morningHeadline =
-
-      `☠️ ${resolvedKill.target} اتقتل
+  if (resolvedKill && resolvedArrest) {
+    morningHeadline = `☠️ ${resolvedKill.target} اتقتل
        و 🚔 ${resolvedArrest.target} اتقبض عليه`;
   }
 
@@ -94,62 +64,37 @@ function MorningScreen({
     ========================
   */
 
-  if (
-    nightResult
-      ?.escapedPlayer
-  ) {
-
-    morningHeadline =
-
-      "🚨 تم تهريب متهم بنجاح";
-  }
-
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        display:
-          "flex",
+        display: "flex",
 
-        justifyContent:
-          "center",
+        justifyContent: "center",
 
-        alignItems:
-          "center",
+        alignItems: "center",
 
-        flexDirection:
-          "column",
+        flexDirection: "column",
 
-        textAlign:
-          "center",
+        textAlign: "center",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        padding:
-          "20px",
+        padding: "20px",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "70px",
+          fontSize: "70px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
 
-          marginBottom:
-            "60px",
+          marginBottom: "60px",
         }}
       >
         الصبح 🌑
@@ -157,77 +102,54 @@ function MorningScreen({
 
       <div
         style={{
-          background:
-            "#111",
+          background: "#111",
 
-          border:
-            "2px solid #333",
+          border: "2px solid #333",
 
-          borderRadius:
-            "30px",
+          borderRadius: "30px",
 
-          padding:
-            "50px",
+          padding: "50px",
 
-          maxWidth:
-            "900px",
+          maxWidth: "900px",
 
-          boxShadow:
-            "0 0 40px rgba(0,0,0,0.7)",
+          boxShadow: "0 0 40px rgba(0,0,0,0.7)",
         }}
       >
-
         <h2
           style={{
-            fontSize:
-              "38px",
+            fontSize: "38px",
 
-            lineHeight:
-              "1.8",
+            lineHeight: "1.8",
 
-            color:
-              "#ddd",
+            color: "#ddd",
           }}
         >
           {morningHeadline}
         </h2>
 
         {meetingTriggered && (
-
           <div
             style={{
+              marginTop: "45px",
 
-              marginTop:
-                "45px",
+              padding: "30px",
 
-              padding:
-                "30px",
+              border: "1px solid crimson",
 
-              border:
-                "1px solid crimson",
+              borderRadius: "25px",
 
-              borderRadius:
-                "25px",
+              background: "rgba(220,20,60,0.08)",
 
-              background:
-                "rgba(220,20,60,0.08)",
-
-              boxShadow:
-                "0 0 25px rgba(220,20,60,0.3)",
+              boxShadow: "0 0 25px rgba(220,20,60,0.3)",
             }}
           >
-
             <h3
               style={{
+                fontSize: "34px",
 
-                fontSize:
-                  "34px",
+                color: "crimson",
 
-                color:
-                  "crimson",
-
-                textShadow:
-                  "0 0 12px crimson",
+                textShadow: "0 0 12px crimson",
               }}
             >
               🚨 اجتماع طارئ
@@ -235,77 +157,46 @@ function MorningScreen({
 
             <p
               style={{
+                marginTop: "20px",
 
-                marginTop:
-                  "20px",
+                fontSize: "24px",
 
-                fontSize:
-                  "24px",
+                lineHeight: "1.9",
 
-                lineHeight:
-                  "1.9",
-
-                color:
-                  "#bbb",
+                color: "#bbb",
               }}
             >
-              العصابة عايزة
-              تتكلم النهارده…
+              العصابة عايزة تتكلم النهارده…
               <br />
-
-              واضح إن حد
-              بقى تحت
-              المجهر 😈
+              واضح إن حد بقى تحت المجهر 😈
             </p>
           </div>
         )}
       </div>
 
       <button
-        onClick={
-          goToDiscussion
-        }
-
+        onClick={goToDiscussion}
         style={{
-          marginTop:
-            "70px",
+          marginTop: "70px",
 
-          background:
-            meetingTriggered
-              ? "crimson"
-              : "#222",
+          background: meetingTriggered ? "crimson" : "#222",
 
-          border:
-            "none",
+          border: "none",
 
-          color:
-            "white",
+          color: "white",
 
-          padding:
-            "22px 55px",
+          padding: "22px 55px",
 
-          borderRadius:
-            "25px",
+          borderRadius: "25px",
 
-          fontSize:
-            "28px",
+          fontSize: "28px",
 
-          cursor:
-            "pointer",
+          cursor: "pointer",
 
-          boxShadow:
-            meetingTriggered
-
-              ? "0 0 20px crimson"
-
-              : "0 0 10px #111",
+          boxShadow: meetingTriggered ? "0 0 20px crimson" : "0 0 10px #111",
         }}
       >
-        {meetingTriggered
-
-          ? "ابدأ الاجتماع 🚨"
-
-          : "يوم جديد 🌑"}
+        {meetingTriggered ? "ابدأ الاجتماع 🚨" : "يوم جديد 🌑"}
       </button>
     </div>
   );

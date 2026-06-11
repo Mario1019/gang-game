@@ -1,31 +1,15 @@
-import {
-  useMemo,
-  useState,
-}
-from "react";
+import { useState } from "react";
 
 function Sha3bataScreen({
-
   currentPlayer,
-
   allPlayers,
-
   addNightAction,
-
   playedPlayers = [],
+  startSecondaryRolePhase,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    locked,
-
-    setLocked,
-  ] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   /*
     ========================
@@ -33,12 +17,9 @@ function Sha3bataScreen({
     ========================
   */
 
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -46,129 +27,82 @@ function Sha3bataScreen({
     ========================
   */
 
-  const randomPlayers =
-    useMemo(() => {
-
-      const shuffled =
-
-        [...availablePlayers]
-          .sort(
-            () =>
-              Math.random() - 0.5
-          );
-
-      const randomCount =
-
-        Math.max(
-          2,
-
-          Math.floor(
-            Math.random() *
-            shuffled.length
-          )
-        );
-
-      return shuffled.slice(
-        0,
-        randomCount
-      );
-
-    }, []);
-
   /*
     ========================
     الاختيار
     ========================
   */
 
-  const chooseTarget =
-    (player) => {
+  const chooseTarget = (player) => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    const alreadyPlayed = playedPlayers.includes(player.playerName);
 
-        return;
-      }
-
-      const alreadyPlayed =
-
-        playedPlayers.includes(
-          player.playerName
-        );
-
-      /*
+    /*
         ========================
         تسجيل الأكشن
         ========================
       */
 
-      addNightAction({
+    addNightAction({
+      role: "شعبطة",
 
-        role:
-          "شعبطة",
+      actor: currentPlayer.playerName,
 
-        actor:
-          currentPlayer
-            .playerName,
+      target: player.playerName,
 
-        target:
-          player.playerName,
-
-        /*
+      /*
           ========================
           الأكشن الحقيقي
           ========================
         */
 
-        action:
-          "copyResult",
+      action: "copyResult",
 
-        /*
+      /*
           ========================
           هل لعب بالفعل؟
           ========================
         */
 
-        alreadyPlayed,
-      });
+      alreadyPlayed,
+    });
 
-      setSelectedPlayer(
-        player.playerName
-      );
+    startSecondaryRolePhase({
+      player: currentPlayer,
+      role: player.realRole,
+      targetPlayer: player,
+      phaseType: "copy",
+    });
 
-      setLocked(true);
-    };
+    setSelectedPlayer(player.playerName);
+
+    setLocked(true);
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         شعبطة 🕶️
@@ -176,153 +110,90 @@ function Sha3bataScreen({
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
 
-          lineHeight:
-            "1.8",
+          lineHeight: "1.8",
         }}
       >
         اختار لاعب…
         <br />
-
-        ولو الليلة عجبتك
-        يمكن تبقى نسخة منه 😈
+        ولو الليلة عجبتك يمكن تبقى نسخة منه 😈
       </p>
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => {
+          const alreadyPlayed = playedPlayers.includes(player.playerName);
 
-        {randomPlayers.map(
-          (
-            player,
-            index
-          ) => {
+          return (
+            <button
+              key={index}
+              disabled={locked}
+              onClick={() => chooseTarget(player)}
+              style={{
+                background:
+                  selectedPlayer === player.playerName
+                    ? "crimson"
+                    : alreadyPlayed
+                      ? "#1a1a1a"
+                      : "#111",
 
-            const alreadyPlayed =
+                border: "1px solid crimson",
 
-              playedPlayers.includes(
-                player.playerName
-              );
+                color: "white",
 
-            return (
+                padding: "20px",
 
-              <button
-                key={index}
+                borderRadius: "20px",
 
-                disabled={locked}
+                fontSize: "24px",
 
-                onClick={() =>
-                  chooseTarget(
-                    player
-                  )
-                }
+                cursor: locked ? "default" : "pointer",
 
-                style={{
-                  background:
+                opacity:
+                  locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+              }}
+            >
+              {player.playerName}
 
-                    selectedPlayer ===
-                    player.playerName
-
-                      ? "crimson"
-
-                      : alreadyPlayed
-
-                        ? "#1a1a1a"
-
-                        : "#111",
-
-                  border:
-                    "1px solid crimson",
-
-                  color:
-                    "white",
-
-                  padding:
-                    "20px",
-
-                  borderRadius:
-                    "20px",
-
-                  fontSize:
-                    "24px",
-
-                  cursor:
-
-                    locked
-                      ? "default"
-                      : "pointer",
-
-                  opacity:
-
-                    locked &&
-                    selectedPlayer !==
-                      player.playerName
-
-                      ? 0.45
-
-                      : 1,
-                }}
-              >
-                {
-                  player.playerName
-                }
-
-                {alreadyPlayed &&
-                  " 👁️"}
-              </button>
-            );
-          }
-        )}
+              {alreadyPlayed && " 👁️"}
+            </button>
+          );
+        })}
       </div>
 
       {selectedPlayer && (
-
         <div
           style={{
-            marginTop:
-              "45px",
+            marginTop: "45px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            background:
-              "#111",
+            background: "#111",
           }}
         >
-
           <p
             style={{
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
             }}
           >
             الهدف المختار
@@ -330,14 +201,11 @@ function Sha3bataScreen({
 
           <h2
             style={{
-              marginTop:
-                "12px",
+              marginTop: "12px",
 
-              fontSize:
-                "40px",
+              fontSize: "40px",
 
-              color:
-                "crimson",
+              color: "crimson",
             }}
           >
             {selectedPlayer}
@@ -345,25 +213,16 @@ function Sha3bataScreen({
 
           <p
             style={{
-              marginTop:
-                "15px",
+              marginTop: "15px",
 
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
             }}
           >
-            {
-              playedPlayers.includes(
-                selectedPlayer
-              )
-
+            {playedPlayers.includes(selectedPlayer)
               ? "👁️ لعب بالفعل وهتشوف نتيجته"
-
-              : "🔥 دوره لسه مجاش وهتسرق شاشته"
-            }
+              : "🔥 دوره لسه مجاش وهتسرق شاشته"}
           </p>
         </div>
       )}

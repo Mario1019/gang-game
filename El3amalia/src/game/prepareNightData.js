@@ -1,55 +1,39 @@
-import { rolesData }
-from "./roles";
+import { rolesData } from "./roles";
 
-export function prepareNightData(
-  players
-) {
+export function prepareNightData(players) {
+  const preparedPlayers = players.map((player) => ({
+    playerName: player.playerName,
 
-  const preparedPlayers =
+    realRole: player.realRole,
 
-    players.map(
-      (player) => ({
+    disguise: player.disguise || null,
 
-        playerName:
-          player.playerName,
+    target: null,
 
-        realRole:
-          player.realRole,
+    blocked: false,
 
-        disguise:
-          player.disguise ||
-          null,
+    cancelled: false,
 
-        target: null,
+    protected: false,
 
-        blocked: false,
+    stolenRole: null,
 
-        cancelled: false,
+    copiedInfo: null,
 
-        protected: false,
+    alive: player.alive,
 
-        stolenRole: null,
+    delayedBlock: player.delayedBlock || false,
 
-        copiedInfo: null,
-
-        alive:
-          player.alive,
-
-        delayedBlock:
-          player.delayedBlock ||
-          false,
-
-        /*
+    /*
           ========================
           استخدامات خاصة
           ========================
         */
 
-        oneTimeUsed:
-          player.oneTimeUsed ||
-          false,
-      })
-    );
+    oneTimeUsed: player.oneTimeUsed || false,
+
+    bulletCount: player.bulletCount ?? 1,
+  }));
 
   /*
     ========================
@@ -58,33 +42,17 @@ export function prepareNightData(
     ========================
   */
 
-  preparedPlayers.sort(
-    (a, b) => {
+  preparedPlayers.sort((a, b) => {
+    const roleA = rolesData[a.realRole];
 
-      const roleA =
-        rolesData[
-          a.realRole
-        ];
+    const roleB = rolesData[b.realRole];
 
-      const roleB =
-        rolesData[
-          b.realRole
-        ];
+    const priorityA = roleA?.priority || 999;
 
-      const priorityA =
-        roleA?.priority ||
-        999;
+    const priorityB = roleB?.priority || 999;
 
-      const priorityB =
-        roleB?.priority ||
-        999;
-
-      return (
-        priorityA -
-        priorityB
-      );
-    }
-  );
+    return priorityA - priorityB;
+  });
 
   return preparedPlayers;
 }

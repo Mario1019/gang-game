@@ -1,9 +1,8 @@
-import { useEffect, useState, } from "react";
+import { useEffect, useState } from "react";
 
 import { roleScreens } from "./roleScreens";
 
 function NightScreen({
-
   currentTurnPlayer,
 
   nightPlayers,
@@ -16,31 +15,20 @@ function NightScreen({
 
   nightActions,
 
-  stolenRoles = [], }) {
+  stolenRoles = [],
+}) {
+  console.log("NightScreen Rendered");
 
-  const [showRoleScreen,
+  const [showRoleScreen, setShowRoleScreen] = useState(false);
 
-    setShowRoleScreen,
+  const [taxTriggered, setTaxTriggered] = useState(false);
 
-  ] = useState(false);
+  const [decisionConfirmed, setDecisionConfirmed] = useState(false);
 
-  const [taxTriggered,
+  const [secondaryDecisionConfirmed, setSecondaryDecisionConfirmed] =
+    useState(false);
 
-    setTaxTriggered,
-
-  ] = useState(false);
-
-  const [decisionConfirmed,
-
-    setDecisionConfirmed,
-
-  ] = useState(false);
-
-  const [pressureTimer,
-
-    setPressureTimer,
-
-  ] = useState(30);
+  const [pressureTimer, setPressureTimer] = useState(30);
 
   const [isSecondaryPhase, setIsSecondaryPhase] = useState(false);
 
@@ -48,17 +36,13 @@ function NightScreen({
 
   const [targetPlayer, setTargetPlayer] = useState(null);
 
+  const [showVictimScreen, setShowVictimScreen] = useState(false);
+
   /*========================لو اللاعب الحالياستخدم قدرته========================*/
 
   const oneTimeAbilityUsed =
-
-    currentTurnPlayer
-      ?.realRole ===
-    "صبحي صيدلية" &&
-
-    currentTurnPlayer
-      ?.oneTimeUsed ===
-    true;
+    currentTurnPlayer?.realRole === "صبحي صيدلية" &&
+    currentTurnPlayer?.oneTimeUsed === true;
 
   /*========================هل اللاعب الحالي متحكم فيه؟========================*/
 
@@ -68,16 +52,9 @@ function NightScreen({
   ========================
   */
 
-  const currentPlayerHijacked =
-    stolenRoles.find(
-      (action) =>
-
-        action.target ===
-        currentTurnPlayer
-          ?.playerName &&
-
-        !action.alreadyPlayed
-    );
+  const currentPlayerHijacked = stolenRoles.find(
+    (action) => action.target === currentTurnPlayer?.playerName,
+  );
 
   /*
   ========================
@@ -85,19 +62,12 @@ function NightScreen({
   ========================
   */
 
-  const sha3bataCopyAction =
-    nightActions.find(
-      (action) =>
-
-        action.action ===
-        "copyResult" &&
-
-        action.target ===
-        currentTurnPlayer
-          ?.playerName &&
-
-        !action.alreadyPlayed
-    );
+  const sha3bataCopyAction = nightActions.find(
+    (action) =>
+      action.action === "copyResult" &&
+      action.target === currentTurnPlayer?.playerName &&
+      !action.alreadyPlayed,
+  );
 
   /*
   ========================
@@ -105,8 +75,7 @@ function NightScreen({
   ========================
   */
 
-  const roleHijacked =
-    currentPlayerHijacked;
+  const roleHijacked = currentPlayerHijacked;
 
   /*
   ========================
@@ -114,8 +83,7 @@ function NightScreen({
   ========================
   */
 
-  let controllerPlayer =
-    currentTurnPlayer;
+  let controllerPlayer = currentTurnPlayer;
 
   /*
   ========================
@@ -123,8 +91,7 @@ function NightScreen({
   ========================
   */
 
-  let roleOwnerPlayer =
-    currentTurnPlayer;
+  let roleOwnerPlayer = currentTurnPlayer;
 
   /*
   ========================
@@ -133,19 +100,12 @@ function NightScreen({
   */
 
   if (currentPlayerHijacked) {
-
-    const hijacker =
-      nightPlayers.find(
-        (player) =>
-
-          player.playerName ===
-          roleHijacked.actor
-      );
+    const hijacker = nightPlayers.find(
+      (player) => player.playerName === roleHijacked.actor,
+    );
 
     if (hijacker) {
-
-      controllerPlayer =
-        hijacker;
+      controllerPlayer = hijacker;
     }
   }
 
@@ -157,10 +117,7 @@ function NightScreen({
 
   const isVictimTurn =
     currentPlayerHijacked &&
-    currentTurnPlayer
-      ?.playerName ===
-    currentPlayerHijacked
-      ?.target;
+    currentTurnPlayer?.playerName === currentPlayerHijacked?.target;
 
   /*
   ========================
@@ -170,10 +127,7 @@ function NightScreen({
 
   const isSayedPlaying =
     currentPlayerHijacked &&
-    controllerPlayer
-      ?.playerName ===
-    currentTurnPlayer
-      ?.playerName;
+    controllerPlayer?.playerName === currentTurnPlayer?.playerName;
 
   /*
   ========================
@@ -182,13 +136,9 @@ function NightScreen({
   ========================
   */
 
-  let effectivePlayer =
-
-    currentPlayerHijacked
-
-      ? controllerPlayer
-
-      : currentTurnPlayer;
+  let effectivePlayer = currentPlayerHijacked
+    ? controllerPlayer
+    : currentTurnPlayer;
 
   if (secondaryRoleData) {
     effectivePlayer = secondaryRoleData.player;
@@ -196,203 +146,145 @@ function NightScreen({
 
   /*========================مفاتن========================*/
 
-  const pressureAction = nightActions.find((action) =>
-
-    (
-      action.action ===
-      "pressureChoice" ||
-
-      action.action ===
-      "quickDecision"
-    ) &&
-
-    action.target ===
-    currentTurnPlayer
-      ?.playerName
+  const pressureAction = nightActions.find(
+    (action) =>
+      (action.action === "pressureChoice" ||
+        action.action === "quickDecision") &&
+      action.target === currentTurnPlayer?.playerName,
   );
 
   /*========================مدة الضغط========================*/
 
-  const pressureDuration =
-
-    pressureAction
-      ?.duration || 30;
+  const pressureDuration = pressureAction?.duration || 30;
 
   /*========================تايمر مفاتن========================*/
 
   useEffect(() => {
+    const confirmed = secondaryRoleData
+      ? secondaryDecisionConfirmed
+      : decisionConfirmed;
 
-    if (
-      !showRoleScreen ||
-
-      !pressureAction ||
-
-      decisionConfirmed
-    ) {
-
+    if (!showRoleScreen || !pressureAction || confirmed) {
       return;
     }
 
-    if (
-      pressureTimer <= 0
-    ) {
-
-      setShowRoleScreen(
-        false
-      );
+    if (pressureTimer <= 0) {
+      setShowRoleScreen(false);
 
       goToNextPlayer();
 
       return;
     }
 
-    const timer =
-      setTimeout(() => {
+    const timer = setTimeout(() => {
+      setPressureTimer((prev) => prev - 1);
+    }, 1000);
 
-        setPressureTimer(
-          (prev) =>
-            prev - 1
-        );
-
-      }, 1000);
-
-    return () =>
-      clearTimeout(
-        timer
-      );
-
+    return () => clearTimeout(timer);
   }, [
-
     pressureTimer,
 
     pressureAction,
 
     decisionConfirmed,
 
+    secondaryDecisionConfirmed,
+
+    secondaryRoleData,
+
     showRoleScreen,
 
     goToNextPlayer,
-
   ]);
 
   /*========================reset========================*/
 
   useEffect(() => {
+    setDecisionConfirmed(false);
 
-    setDecisionConfirmed(
-      false
-    );
-
-    setPressureTimer(
-      pressureDuration
-    );
+    setPressureTimer(pressureDuration);
 
     setIsSecondaryPhase(false);
 
     setSecondaryRoleData(null);
 
+    setShowRoleScreen(false);
+
     setTargetPlayer(null);
 
-  }, [
+    setSecondaryDecisionConfirmed(false);
 
-    currentTurnPlayer,
+    setShowVictimScreen(false);
 
-    pressureDuration,
+    console.log("TURN CHANGED:", currentTurnPlayer?.playerName);
 
-  ]);
+    console.log("SHOW ROLE SCREEN:", showRoleScreen);
+  }, [currentTurnPlayer, pressureDuration]);
 
   /*========================لو الليل خلص========================*/
 
   if (!currentTurnPlayer) {
-
     return (
-
       <div
         style={{
-          height:
-            "100vh",
+          height: "100vh",
 
-          background:
-            "#000",
+          background: "#000",
 
-          color:
-            "white",
+          color: "white",
 
-          display:
-            "flex",
+          display: "flex",
 
-          justifyContent:
-            "center",
+          justifyContent: "center",
 
-          alignItems:
-            "center",
+          alignItems: "center",
 
-          fontSize:
-            "50px",
+          fontSize: "50px",
 
-          fontFamily:
-            "sans-serif",
+          fontFamily: "sans-serif",
         }}
       >
         خلص الليل 😈
       </div>
     );
-
   }
 
   /*========================صبحي خلص قدرته========================*/
 
   if (oneTimeAbilityUsed) {
-
     setTimeout(() => {
-
       goToNextPlayer();
-
     }, 100);
 
     return (
-
       <div
         style={{
-          height:
-            "100vh",
+          height: "100vh",
 
-          background:
-            "#050505",
+          background: "#050505",
 
-          color:
-            "white",
+          color: "white",
 
-          display:
-            "flex",
+          display: "flex",
 
-          justifyContent:
-            "center",
+          justifyContent: "center",
 
-          alignItems:
-            "center",
+          alignItems: "center",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          textAlign:
-            "center",
+          textAlign: "center",
 
-          fontFamily:
-            "sans-serif",
+          fontFamily: "sans-serif",
 
-          padding:
-            "20px",
+          padding: "20px",
         }}
       >
-
         <h1
           style={{
-            fontSize:
-              "80px",
+            fontSize: "80px",
 
-            textShadow:
-              "0 0 25px crimson",
+            textShadow: "0 0 25px crimson",
           }}
         >
           💊
@@ -400,207 +292,86 @@ function NightScreen({
 
         <h2
           style={{
-            marginTop:
-              "20px",
+            marginTop: "20px",
 
-            fontSize:
-              "42px",
+            fontSize: "42px",
           }}
         >
-          {
-            currentTurnPlayer
-              .playerName
-          }
+          {currentTurnPlayer.playerName}
         </h2>
 
         <p
           style={{
-            marginTop:
-              "20px",
+            marginTop: "20px",
 
-            color:
-              "#999",
+            color: "#999",
 
-            fontSize:
-              "24px",
+            fontSize: "24px",
 
-            lineHeight:
-              "1.8",
+            lineHeight: "1.8",
           }}
         >
-          استخدم آخر ورقة
-          معاه بالفعل…
+          استخدم آخر ورقة معاه بالفعل…
           <br />
-
-          الليلة دي
-          ملوش حركة 😈
+          الليلة دي ملوش حركة 😈
         </p>
       </div>
     );
-
   }
 
   /*========================اللاعب المسروق========================*/
 
-  if (
-    isVictimTurn &&
-    controllerPlayer.realRole === "سيد بشرية"
-  ) {
-
-    setTimeout(() => {
-
-      goToNextPlayer();
-
-    }, 100);
-
-    return (
-
-      <div
-        style={{
-          height:
-            "100vh",
-
-          background:
-            "#050505",
-
-          color:
-            "white",
-
-          display:
-            "flex",
-
-          justifyContent:
-            "center",
-
-          alignItems:
-            "center",
-
-          flexDirection:
-            "column",
-
-          textAlign:
-            "center",
-
-          fontFamily:
-            "sans-serif",
-
-          padding:
-            "20px",
-        }}
-      >
-
-        <h1
-          style={{
-            fontSize:
-              "70px",
-
-            color:
-              "crimson",
-
-            textShadow:
-              "0 0 20px crimson",
-          }}
-        >
-          😈
-        </h1>
-
-        <h2
-          style={{
-            marginTop:
-              "20px",
-
-            fontSize:
-              "42px",
-          }}
-        >
-          اسند ضهرك يا نجم
-        </h2>
-
-        <p
-          style={{
-            marginTop:
-              "15px",
-
-            fontSize:
-              "24px",
-
-            color:
-              "#999",
-          }}
-        >
-          دورك اتلعب بيه الليلة
-        </p>
-      </div>
-    );
-
-  }
+  console.log("VICTIM CHECK", {
+    current: currentTurnPlayer?.playerName,
+    hijacked: currentPlayerHijacked,
+    controller: controllerPlayer?.realRole,
+    isVictimTurn,
+  });
 
   /*========================كريم كوشة========================*/
 
-  const removedAction = nightActions.find((action) =>
-
-    action.action ===
-    "removeFromNight" &&
-
-    action.target ===
-    currentTurnPlayer
-      .playerName
+  const removedAction = nightActions.find(
+    (action) =>
+      action.action === "removeFromNight" &&
+      action.target === currentTurnPlayer.playerName,
   );
 
   if (removedAction) {
-
     setTimeout(() => {
-
       goToNextPlayer();
-
     }, 100);
 
     return (
-
       <div
         style={{
-          height:
-            "100vh",
+          height: "100vh",
 
-          background:
-            "#050505",
+          background: "#050505",
 
-          color:
-            "white",
+          color: "white",
 
-          display:
-            "flex",
+          display: "flex",
 
-          justifyContent:
-            "center",
+          justifyContent: "center",
 
-          alignItems:
-            "center",
+          alignItems: "center",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          textAlign:
-            "center",
+          textAlign: "center",
 
-          fontFamily:
-            "sans-serif",
+          fontFamily: "sans-serif",
 
-          padding:
-            "20px",
+          padding: "20px",
         }}
       >
-
         <h1
           style={{
-            fontSize:
-              "55px",
+            fontSize: "55px",
 
-            color:
-              "crimson",
+            color: "crimson",
 
-            textShadow:
-              "0 0 20px crimson",
+            textShadow: "0 0 20px crimson",
           }}
         >
           🚫
@@ -608,60 +379,43 @@ function NightScreen({
 
         <h2
           style={{
-            marginTop:
-              "20px",
+            marginTop: "20px",
 
-            fontSize:
-              "38px",
+            fontSize: "38px",
           }}
         >
-          {
-            currentTurnPlayer
-              .playerName
-          }
+          {currentTurnPlayer.playerName}
         </h2>
 
         <p
           style={{
-            marginTop:
-              "15px",
+            marginTop: "15px",
 
-            fontSize:
-              "24px",
+            fontSize: "24px",
 
-            color:
-              "#999",
+            color: "#999",
           }}
         >
           اختفى الليلة 😈
         </p>
       </div>
     );
-
   }
 
   /*========================وحيد الفاجر========================*/
 
-  const cancelledAction = nightActions.find((action) =>
-
-    action.action ===
-    "cancelRole" &&
-
-    action.target ===
-    currentTurnPlayer
-      .playerName
+  const cancelledAction = nightActions.find(
+    (action) =>
+      action.action === "cancelRole" &&
+      action.target === currentTurnPlayer.playerName,
   );
 
   /*========================ذيكو========================*/
 
-  const fakeUIAction = nightActions.find((action) =>
-
-    action.action ===
-    "fakeUI" &&
-
-    action.target ===
-    currentTurnPlayer
-      .playerName
+  const fakeUIAction = nightActions.find(
+    (action) =>
+      action.action === "fakeUI" &&
+      action.target === currentTurnPlayer.playerName,
   );
 
   /*========================الدور الحالي========================*/
@@ -681,95 +435,59 @@ function NightScreen({
   let displayedPlayers = [...nightPlayers];
 
   if (fakeUIAction) {
+    displayedPlayers = [...nightPlayers]
+      .sort(() => Math.random() - 0.5)
+      .map((player) => ({
+        ...player,
 
-    displayedPlayers =
-      [...nightPlayers]
-        .sort(
-          () =>
-            Math.random() - 0.5
-        )
-        .map((player) => ({
-
-          ...player,
-
-          playerName:
-
-            Math.random() >
-              0.5
-
-              ? player.playerName
-
-              : nightPlayers[
-                Math.floor(
-                  Math.random() *
-                  nightPlayers.length
-                )
-              ].playerName,
-        }));
-
+        playerName:
+          Math.random() > 0.5
+            ? player.playerName
+            : nightPlayers[Math.floor(Math.random() * nightPlayers.length)]
+                .playerName,
+      }));
   }
 
   /*========================تااااكس========================*/
 
   if (taxTriggered) {
-
     setTimeout(() => {
+      setTaxTriggered(false);
 
-      setTaxTriggered(
-        false
-      );
-
-      setShowRoleScreen(
-        false
-      );
+      setShowRoleScreen(false);
 
       goToNextPlayer();
-
     }, 1700);
 
     return (
-
       <div
         style={{
-          height:
-            "100vh",
+          height: "100vh",
 
-          background:
-            "#050505",
+          background: "#050505",
 
-          color:
-            "white",
+          color: "white",
 
-          display:
-            "flex",
+          display: "flex",
 
-          justifyContent:
-            "center",
+          justifyContent: "center",
 
-          alignItems:
-            "center",
+          alignItems: "center",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          fontFamily:
-            "sans-serif",
+          fontFamily: "sans-serif",
         }}
       >
-
         <h1
           style={{
-            fontSize:
-              "120px",
+            fontSize: "120px",
 
-            color:
-              "crimson",
+            color: "crimson",
 
-            textShadow:
-              "0 0 40px crimson",
+            textShadow: "0 0 40px crimson",
 
-            transform:
-              "rotate(-6deg)",
+            transform: "rotate(-6deg)",
           }}
         >
           ✋ تااااكس
@@ -777,402 +495,384 @@ function NightScreen({
 
         <p
           style={{
-            marginTop:
-              "20px",
+            marginTop: "20px",
 
-            fontSize:
-              "28px",
+            fontSize: "28px",
 
-            color:
-              "#999",
+            color: "#999",
           }}
         >
           دورك اتلغى الليلة 😈
         </p>
       </div>
     );
+  }
 
+  if (showVictimScreen) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          background: "#050505",
+          color: "white",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          textAlign: "center",
+          fontFamily: "sans-serif",
+          padding: "20px",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "70px",
+            color: "crimson",
+            textShadow: "0 0 20px crimson",
+          }}
+        >
+          😈
+        </h1>
+
+        <h2
+          style={{
+            marginTop: "20px",
+            fontSize: "42px",
+          }}
+        >
+          اسند ضهرك يا نجم
+        </h2>
+
+        <p
+          style={{
+            marginTop: "20px",
+            fontSize: "24px",
+            color: "#999",
+          }}
+        >
+          دورك اتلعب بيه الليلة
+        </p>
+
+        <button
+          onClick={() => {
+            setShowVictimScreen(false);
+
+            goToNextPlayer();
+          }}
+          style={{
+            marginTop: "40px",
+            background: "crimson",
+            border: "none",
+            color: "white",
+            padding: "20px 45px",
+            borderRadius: "20px",
+            fontSize: "24px",
+            cursor: "pointer",
+            boxShadow: "0 0 20px crimson",
+          }}
+        >
+          التالي 😈
+        </button>
+      </div>
+    );
   }
 
   return (
-
     <div>
-
       {!showRoleScreen ? (
-
         <div
           style={{
-            height:
-              "100vh",
+            height: "100vh",
 
-            background:
-              fakeUIAction
-                ? "#120505"
-                : "#050505",
+            background: fakeUIAction ? "#120505" : "#050505",
 
-            color:
-              "white",
+            color: "white",
 
-            display:
-              "flex",
+            display: "flex",
 
-            justifyContent:
-              "center",
+            justifyContent: "center",
 
-            alignItems:
-              "center",
+            alignItems: "center",
 
-            flexDirection:
-              "column",
+            flexDirection: "column",
 
-            textAlign:
-              "center",
+            textAlign: "center",
 
-            fontFamily:
-              "sans-serif",
+            fontFamily: "sans-serif",
 
-            padding:
-              "20px",
+            padding: "20px",
           }}
         >
-
           <h1
             style={{
-              fontSize:
-                "45px",
+              fontSize: "45px",
 
-              textShadow:
-                "0 0 20px crimson",
+              textShadow: "0 0 20px crimson",
             }}
           >
-            ادّي الموبايل لـ
+            {secondaryRoleData
+              ? "تمت السرقة بنجاح 😈"
+              : "ادّي الموبايل لـ"}{" "}
           </h1>
 
           <h2
             style={{
-              marginTop:
-                "25px",
+              marginTop: "25px",
 
-              fontSize:
-                "60px",
+              fontSize: "60px",
 
-              color:
-                "crimson",
+              color: "crimson",
             }}
           >
-            {
-              secondaryRoleData ? secondaryRoleData.player.playerName : controllerPlayer.playerName
-            }
+            {secondaryRoleData
+              ? secondaryRoleData.role
+              : currentTurnPlayer.playerName}
           </h2>
 
-          {(() => {
-            const isOriginal = secondaryRoleData && secondaryRoleData.player !== controllerPlayer;
-            const isStolen = secondaryRoleData || currentPlayerHijacked;
-            return isOriginal ? (
-              <p
-                style={{
-                  marginTop:
-                    "20px",
-
-                  color:
-                    "crimson",
-
-                  fontSize:
-                    "24px",
-                }}
-              >
-                دورك الأصلي 😈
-              </p>
-            ) : isStolen ? (
-              <p
-                style={{
-                  marginTop:
-                    "20px",
-
-                  color:
-                    "crimson",
-
-                  fontSize:
-                    "24px",
-                }}
-              >
-                😈 دور مسروق
-              </p>
-            ) : null;
-          })()}
-
           <button
-            onClick={() =>
-              setShowRoleScreen(
-                true
-              )
-            }
+            onClick={() => {
+              if (isVictimTurn && controllerPlayer.realRole === "سيد بشرية") {
+                setShowVictimScreen(true);
 
+                return;
+              }
+
+              setShowRoleScreen(true);
+            }}
             style={{
-              marginTop:
-                "60px",
+              marginTop: "60px",
 
-              background:
-                "crimson",
+              background: "crimson",
 
-              border:
-                "none",
+              border: "none",
 
-              color:
-                "white",
+              color: "white",
 
-              padding:
-                "20px 45px",
+              padding: "20px 45px",
 
-              borderRadius:
-                "20px",
+              borderRadius: "20px",
 
-              fontSize:
-                "24px",
+              fontSize: "24px",
 
-              cursor:
-                "pointer",
+              cursor: "pointer",
 
-              boxShadow:
-                "0 0 20px crimson",
+              boxShadow: "0 0 20px crimson",
             }}
           >
             افتح دورك 😈
           </button>
         </div>
-
       ) : (
-
         <div
           onClick={() => {
-
-            if (
-              cancelledAction &&
-              !taxTriggered
-            ) {
-
-              setTaxTriggered(
-                true
-              );
+            if (cancelledAction && !taxTriggered) {
+              setTaxTriggered(true);
             }
           }}
         >
+          {pressureAction && !decisionConfirmed && (
+            <div
+              style={{
+                position: "fixed",
 
-          {pressureAction &&
-            !decisionConfirmed && (
+                top: "20px",
 
-              <div
-                style={{
-                  position:
-                    "fixed",
+                right: "20px",
 
-                  top:
-                    "20px",
+                background: "crimson",
 
-                  right:
-                    "20px",
+                color: "white",
 
-                  background:
-                    "crimson",
+                padding: "18px 28px",
 
-                  color:
-                    "white",
+                borderRadius: "20px",
 
-                  padding:
-                    "18px 28px",
+                fontSize: "32px",
 
-                  borderRadius:
-                    "20px",
+                zIndex: 99999,
 
-                  fontSize:
-                    "32px",
-
-                  zIndex:
-                    99999,
-
-                  boxShadow:
-                    "0 0 20px crimson",
-                }}
-              >
-                ⏳
-                {" "}
-                {pressureTimer}
-              </div>
-            )}
+                boxShadow: "0 0 20px crimson",
+              }}
+            >
+              ⏳ {pressureTimer}
+            </div>
+          )}
 
           {RoleScreen && (
-
             <RoleScreen
-              currentPlayer={
-                effectivePlayer
-              }
-
-              allPlayers={
-                displayedPlayers
-              }
-
+              startSecondaryRolePhase={(data) => {
+                setSecondaryRoleData(data);
+                setShowRoleScreen(true);
+              }}
+              currentPlayer={effectivePlayer}
+              allPlayers={displayedPlayers}
               addNightAction={
                 cancelledAction
-
-                  ? () => { }
-
+                  ? () => {}
                   : (...args) => {
+                      console.log("ADD ACTION", args);
+                      if (secondaryRoleData) {
+                        setSecondaryDecisionConfirmed(true);
+                      } else {
+                        setDecisionConfirmed(true);
+                      }
 
-                    setDecisionConfirmed(
-                      true
-                    );
+                      addNightAction(...args);
 
-                    addNightAction(
-                      ...args
-                    );
+                      const action = args[0];
 
-                    const action = args[0];
-
-                    if (
-                      action.action ===
-                      "steal" ||
-                      action.action ===
-                      "copy"
-                    ) {
-
-                      const tp =
-                        nightPlayers.find(
-                          (p) =>
-                            p.playerName ===
-                            action.target
+                      if (
+                        action.action === "stealRole" ||
+                        action.action === "copyResult"
+                      ) {
+                        const tp = nightPlayers.find(
+                          (p) => p.playerName === action.target,
                         );
 
-                      setTargetPlayer(tp);
+                        console.log("TARGET PLAYER:", tp);
 
-                      setSecondaryRoleData({
-                        role: tp.realRole,
-                        player: controllerPlayer,
-                      });
+                        setTargetPlayer(tp);
 
-                      setShowRoleScreen(
-                        false
-                      );
+                        const undercoverPoliceRoles = [
+                          "تيسير بيه",
+                          "أبو منة",
+                          "حودة الغلبان",
+                        ];
+
+                        console.log("STEAL DEBUG:", {
+                          playerName: tp.playerName,
+                          realRole: tp.realRole,
+                          disguise: tp.disguise,
+                        });
+
+                        setSecondaryRoleData({
+                          role: tp.disguise || tp.realRole,
+                          player: controllerPlayer,
+                        });
+
+                        console.log("SECONDARY ROLE SET:", tp.realRole);
+
+                        setShowRoleScreen(false);
+                      }
                     }
-                  }
               }
-
-              nightActions={
-                nightActions
-              }
-
+              nightActions={nightActions}
               roleOwner={
                 secondaryRoleData
-                  ? (
-                    secondaryRoleData.player ===
-                    controllerPlayer
-                      ? roleOwnerPlayer.playerName
-                      : null
-                  )
+                  ? secondaryRoleData.player === controllerPlayer
+                    ? roleOwnerPlayer.playerName
+                    : null
                   : roleHijacked
-                  ? roleOwnerPlayer.playerName
-                  : null
+                    ? roleOwnerPlayer.playerName
+                    : null
               }
             />
           )}
 
           {!cancelledAction && (
-
             <button
               onClick={() => {
+                const isSecondary = !!secondaryRoleData;
 
-                if (
-                  !decisionConfirmed
-                ) {
+                const currentConfirmed = isSecondary
+                  ? secondaryDecisionConfirmed
+                  : decisionConfirmed;
+
+                if (!currentConfirmed) {
+                  return;
+                }
+
+                /*
+                  ========================
+                  Secondary Phase
+                  ========================
+                */
+
+                if (isSecondary) {
+                  setSecondaryRoleData(null);
+
+                  setTargetPlayer(null);
+
+                  setSecondaryDecisionConfirmed(false);
+
+                  setShowRoleScreen(false);
+
+                  console.log(
+                    "NEXT PLAYER CLICKED",
+                    currentTurnPlayer?.playerName,
+                    currentTurnPlayer?.realRole,
+                  );
+
+                  goToNextPlayer();
 
                   return;
                 }
 
-                if (secondaryRoleData) {
-                  if (
-                    controllerPlayer.realRole ===
-                    "شعبطة" &&
-                    secondaryRoleData.player.playerName ===
-                    controllerPlayer.playerName
-                  ) {
-                    setSecondaryRoleData({
-                      role: targetPlayer.realRole,
-                      player: targetPlayer,
-                    });
-                  } else {
-                    setSecondaryRoleData(null);
-                    setTargetPlayer(null);
-                  }
-                  setShowRoleScreen(false);
-                  goToNextPlayer();
-                } else {
-                  setShowRoleScreen(false);
-                  goToNextPlayer();
-                }
+                /*
+                  ========================
+                  Normal Phase
+                  ========================
+                */
+
+                setShowRoleScreen(false);
+
+                goToNextPlayer();
               }}
-
               disabled={
-                !decisionConfirmed
+                !(secondaryRoleData
+                  ? secondaryDecisionConfirmed
+                  : decisionConfirmed)
               }
-
               style={{
-                position:
-                  "fixed",
+                position: "fixed",
 
-                bottom:
-                  "20px",
+                bottom: "20px",
 
-                left:
-                  "20px",
+                left: "20px",
 
-                background:
+                background: (
+                  secondaryRoleData
+                    ? secondaryDecisionConfirmed
+                    : decisionConfirmed
+                )
+                  ? "crimson"
+                  : "#333",
 
-                  decisionConfirmed
+                border: "none",
 
-                    ? "crimson"
+                color: (
+                  secondaryRoleData
+                    ? secondaryDecisionConfirmed
+                    : decisionConfirmed
+                )
+                  ? "white"
+                  : "#777",
 
-                    : "#333",
+                padding: "18px 30px",
 
-                border:
-                  "none",
+                borderRadius: "18px",
 
-                color:
+                fontSize: "22px",
 
-                  decisionConfirmed
+                cursor: (
+                  secondaryRoleData
+                    ? secondaryDecisionConfirmed
+                    : decisionConfirmed
+                )
+                  ? "pointer"
+                  : "not-allowed",
 
-                    ? "white"
+                zIndex: 9999,
 
-                    : "#777",
+                boxShadow: (
+                  secondaryRoleData
+                    ? secondaryDecisionConfirmed
+                    : decisionConfirmed
+                )
+                  ? "0 0 20px crimson"
+                  : "none",
 
-                padding:
-                  "18px 30px",
-
-                borderRadius:
-                  "18px",
-
-                fontSize:
-                  "22px",
-
-                cursor:
-
-                  decisionConfirmed
-
-                    ? "pointer"
-
-                    : "not-allowed",
-
-                zIndex:
-                  9999,
-
-                boxShadow:
-
-                  decisionConfirmed
-
-                    ? "0 0 20px crimson"
-
-                    : "none",
-
-                transition:
-                  "0.2s",
+                transition: "0.2s",
               }}
             >
               التالي 😈
@@ -1181,7 +881,6 @@ function NightScreen({
         </div>
       )}
     </div>
-
   );
 }
 

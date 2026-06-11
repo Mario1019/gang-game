@@ -21,3 +21,41 @@ export function getActions(
       actionName
   );
 }
+
+export function normalizeAction(
+  action
+) {
+
+  return {
+
+    type:
+      action.action ||
+
+      null,
+
+    actor:
+      action.actor ||
+
+      null,
+
+    target:
+      action.target ||
+
+      null,
+
+    role:
+      action.role ||
+
+      null,
+
+    message:
+      action.message ||
+
+      null,
+
+    metadata:
+      action.metadata ||
+
+      {},
+  };
+}

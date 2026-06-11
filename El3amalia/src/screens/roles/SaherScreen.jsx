@@ -1,8 +1,6 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function SaherScreen({
-
   currentPlayer,
 
   allPlayers,
@@ -11,33 +9,19 @@ function SaherScreen({
 
   roleOwner,
 }) {
+  const [selectedTarget, setSelectedTarget] = useState(null);
 
-  const [
-    selectedTarget,
+  const [bulletSaved, setBulletSaved] = useState(false);
 
-    setSelectedTarget,
-  ] = useState(null);
-
-  const [
-    bulletSaved,
-
-    setBulletSaved,
-  ] = useState(false);
-
-  const availableTargets =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availableTargets = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     مين بينفذ الدور فعليًا
   */
 
-  const realActor =
-    roleOwner ||
-    currentPlayer.playerName;
+  const realActor = roleOwner || currentPlayer.playerName;
 
   /*
     ========================
@@ -45,31 +29,22 @@ function SaherScreen({
     ========================
   */
 
-  const chooseTarget =
-    (target) => {
+  const chooseTarget = (target) => {
+    if (currentPlayer.bulletCount <= 0) {
+      return;
+    }
 
-      setBulletSaved(
-        false
-      );
+    setBulletSaved(false);
 
-      setSelectedTarget(
-        target
-      );
+    setSelectedTarget(target);
 
-      addNightAction({
-
-        role:
-          "ساهر",
-
-        actor:
-          realActor,
-
-        target,
-
-        action:
-          "kill",
-      });
-    };
+    addNightAction({
+      role: "ساهر",
+      actor: realActor,
+      target,
+      action: "kill",
+    });
+  };
 
   /*
     ========================
@@ -77,248 +52,170 @@ function SaherScreen({
     ========================
   */
 
-  const saveBullet =
-    () => {
+  const saveBullet = () => {
+    setSelectedTarget(null);
 
-      setSelectedTarget(
-        null
-      );
+    setBulletSaved(true);
 
-      setBulletSaved(
-        true
-      );
+    addNightAction({
+      role: "ساهر",
 
-      addNightAction({
+      actor: realActor,
 
-        role:
-          "ساهر",
-
-        actor:
-          realActor,
-
-        action:
-          "saveBullet",
-      });
-    };
+      action: "saveBullet",
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         ساهر 🔪
       </h1>
 
+      <h2
+        style={{
+          marginTop: "15px",
+          color: "gold",
+        }}
+      >
+        💥 {currentPlayer.bulletCount}
+      </h2>
+
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
 
-          lineHeight:
-            "1.8",
+          lineHeight: "1.8",
         }}
       >
         اختار لاعب للتخلص منه
         <br />
-        أو وفّر الطلقة للجولة
-        القادمة
+        أو وفّر الطلقة للجولة القادمة
       </p>
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "20px",
+          gap: "20px",
         }}
       >
+        {availableTargets.map((player, index) => (
+          <button
+            key={index}
+            disabled={currentPlayer.bulletCount <= 0}
+            onClick={() => chooseTarget(player.playerName)}
+            style={{
+              background:
+                selectedTarget === player.playerName ? "crimson" : "#111",
 
-        {availableTargets.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              onClick={() =>
-                chooseTarget(
-                  player.playerName
-                )
-              }
+              padding: "20px",
 
-              style={{
-                background:
+              borderRadius: "20px",
 
-                  selectedTarget ===
-                  player.playerName
+              fontSize: "24px",
 
-                    ? "crimson"
+              cursor: "pointer",
 
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-                  "pointer",
-
-                transition:
-                  "0.2s",
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              transition: "0.2s",
+            }}
+          >
+            {player.playerName}
+          </button>
+        ))}
       </div>
 
       <button
-        onClick={
-          saveBullet
-        }
-
+        onClick={saveBullet}
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          background:
+          background: bulletSaved ? "crimson" : "#222",
 
-            bulletSaved
-              ? "crimson"
-              : "#222",
+          border: "1px solid #666",
 
-          border:
-            "1px solid #666",
+          color: "white",
 
-          color:
-            "white",
+          padding: "20px 35px",
 
-          padding:
-            "20px 35px",
+          borderRadius: "20px",
 
-          borderRadius:
-            "20px",
+          fontSize: "22px",
 
-          fontSize:
-            "22px",
-
-          cursor:
-            "pointer",
+          cursor: "pointer",
         }}
       >
         توفير الطلقة 🎯
       </button>
 
       {selectedTarget && (
-
         <div
           style={{
-            marginTop:
-              "40px",
+            marginTop: "40px",
 
-            background:
-              "#111",
+            background: "#111",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            fontSize:
-              "28px",
+            fontSize: "28px",
           }}
         >
-          🔪 تم اختيار:
-          {" "}
-          {selectedTarget}
+          🔪 تم اختيار: {selectedTarget}
         </div>
       )}
 
       {bulletSaved && (
-
         <div
           style={{
-            marginTop:
-              "40px",
+            marginTop: "40px",
 
-            background:
-              "#111",
+            background: "#111",
 
-            border:
-              "1px solid #666",
+            border: "1px solid #666",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            fontSize:
-              "28px",
+            fontSize: "28px",
 
-            color:
-              "#ccc",
+            color: "#ccc",
           }}
         >
           🎯 تم توفير الطلقة
