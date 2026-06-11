@@ -1,30 +1,19 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function TaysirScreen({
-
   currentPlayer,
 
   allPlayers,
 
-  nightActions,
+  officerMessages,
 
   addNightAction,
 
   roleOwner,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    locked,
-
-    setLocked,
-  ] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   /*
     ========================
@@ -32,12 +21,7 @@ function TaysirScreen({
     ========================
   */
 
-  const realActor =
-
-    roleOwner ||
-
-    currentPlayer
-      .playerName;
+  const realActor = roleOwner || currentPlayer.playerName;
 
   /*
     ========================
@@ -45,17 +29,7 @@ function TaysirScreen({
     ========================
   */
 
-  const messages =
-
-    nightActions.filter(
-      (action) =>
-
-        action.action ===
-          "intel" ||
-
-        action.action ===
-          "stealIntel"
-    );
+  const messages = officerMessages || [];
 
   /*
     ========================
@@ -63,15 +37,9 @@ function TaysirScreen({
     ========================
   */
 
-  const availablePlayers =
-
-    allPlayers.filter(
-      (player) =>
-
-        player.playerName !==
-          currentPlayer
-            .playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -79,35 +47,25 @@ function TaysirScreen({
     ========================
   */
 
-  const arrestPlayer =
-    (name) => {
+  const arrestPlayer = (name) => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    setSelectedPlayer(name);
 
-        return;
-      }
+    setLocked(true);
 
-      setSelectedPlayer(
-        name
-      );
+    addNightAction({
+      role: "تيسير بيه",
 
-      setLocked(true);
+      actor: realActor,
 
-      addNightAction({
+      target: name,
 
-        role:
-          "تيسير بيه",
-
-        actor:
-          realActor,
-
-        target:
-          name,
-
-        action:
-          "arrest",
-      });
-    };
+      action: "arrest",
+    });
+  };
 
   /*
     ========================
@@ -115,64 +73,45 @@ function TaysirScreen({
     ========================
   */
 
-  const skipArrest =
-    () => {
+  const skipArrest = () => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    setSelectedPlayer("مفيش أدلة كفاية");
 
-        return;
-      }
+    setLocked(true);
 
-      setSelectedPlayer(
-        "مفيش أدلة كفاية"
-      );
+    addNightAction({
+      role: "تيسير بيه",
 
-      setLocked(true);
+      actor: realActor,
 
-      addNightAction({
-
-        role:
-          "تيسير بيه",
-
-        actor:
-          realActor,
-
-        action:
-          "skipArrest",
-      });
-    };
+      action: "skipArrest",
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         تيسير بيه 🚔
@@ -180,14 +119,11 @@ function TaysirScreen({
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
         }}
       >
         وصلك بلاغ الليلة
@@ -195,91 +131,60 @@ function TaysirScreen({
 
       <div
         style={{
-          marginTop:
-            "40px",
+          marginTop: "40px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
-
         {messages.length > 0 ? (
+          messages.map((message, index) => (
+            <div
+              key={index}
+              style={{
+                background: "#111",
 
-          messages.map(
-            (
-              message,
-              index
-            ) => (
+                border: "1px solid crimson",
 
-              <div
-                key={index}
+                borderRadius: "20px",
 
-                style={{
-                  background:
-                    "#111",
+                padding: "20px",
 
-                  border:
-                    "1px solid crimson",
-
-                  borderRadius:
-                    "20px",
-
-                  padding:
-                    "20px",
-
-                  fontSize:
-                    "24px",
-                }}
-              >
-                {
-                  message.message
-                }
-              </div>
-            )
-          )
-
+                fontSize: "24px",
+              }}
+            >
+              {message.message}
+            </div>
+          ))
         ) : (
-
           <div
             style={{
-              background:
-                "#111",
+              background: "#111",
 
-              border:
-                "1px solid #444",
+              border: "1px solid #444",
 
-              borderRadius:
-                "20px",
+              borderRadius: "20px",
 
-              padding:
-                "20px",
+              padding: "20px",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
 
-              color:
-                "#888",
+              color: "#888",
             }}
           >
-            مفيش أي بلاغات
-            الليلة 😮‍💨
+            مفيش أي بلاغات الليلة 😮‍💨
           </div>
         )}
       </div>
 
       <h2
         style={{
-          marginTop:
-            "60px",
+          marginTop: "60px",
 
-          fontSize:
-            "35px",
+          fontSize: "35px",
         }}
       >
         هتقبض على مين؟
@@ -287,119 +192,64 @@ function TaysirScreen({
 
       <div
         style={{
-          marginTop:
-            "35px",
+          marginTop: "35px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            disabled={locked}
+            onClick={() => arrestPlayer(player.playerName)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-        {availablePlayers.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              disabled={locked}
+              padding: "20px",
 
-              onClick={() =>
-                arrestPlayer(
-                  player.playerName
-                )
-              }
+              borderRadius: "20px",
 
-              style={{
-                background:
+              fontSize: "24px",
 
-                  selectedPlayer ===
-                  player.playerName
+              cursor: "pointer",
 
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-                  "pointer",
-
-                opacity:
-
-                  locked &&
-                  selectedPlayer !==
-                    player.playerName
-
-                    ? 0.45
-
-                    : 1,
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              opacity:
+                locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+            }}
+          >
+            {player.playerName}
+          </button>
+        ))}
       </div>
 
       <button
         disabled={locked}
-
         onClick={skipArrest}
-
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          background:
+          background: selectedPlayer === "مفيش أدلة كفاية" ? "crimson" : "#222",
 
-            selectedPlayer ===
-            "مفيش أدلة كفاية"
+          border: "1px solid #666",
 
-              ? "crimson"
+          color: "white",
 
-              : "#222",
+          padding: "20px 35px",
 
-          border:
-            "1px solid #666",
+          borderRadius: "20px",
 
-          color:
-            "white",
+          fontSize: "22px",
 
-          padding:
-            "20px 35px",
-
-          borderRadius:
-            "20px",
-
-          fontSize:
-            "22px",
-
-          cursor:
-            "pointer",
+          cursor: "pointer",
         }}
       >
         مفيش أدلة كفاية 🕵️

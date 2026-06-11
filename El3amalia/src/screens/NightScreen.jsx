@@ -16,6 +16,8 @@ function NightScreen({
   nightActions,
 
   stolenRoles = [],
+
+  officerMessages = [],
 }) {
   console.log("NightScreen Rendered");
 
@@ -757,6 +759,7 @@ function NightScreen({
                     }
               }
               nightActions={nightActions}
+              officerMessages={officerMessages}
               roleOwner={
                 secondaryRoleData
                   ? secondaryRoleData.player === controllerPlayer

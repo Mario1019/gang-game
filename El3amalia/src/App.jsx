@@ -55,6 +55,10 @@ function App() {
 
   const [stolenRoles, setStolenRoles] = useState([]);
 
+  const [officerMessages, setOfficerMessages] = useState([]);
+
+  const [pendingOfficerMessages, setPendingOfficerMessages] = useState([]);
+
   /*
     ========================
     اجتماع العصابة
@@ -88,6 +92,10 @@ function App() {
 
     if (action.action === "stealRole") {
       setStolenRoles((prev) => [...prev, action]);
+    }
+
+    if (action.action === "intel" || action.action === "stealIntel") {
+      setPendingOfficerMessages((prev) => [...prev, action]);
     }
 
     setNightActions((prev) => [...prev, action]);
@@ -172,6 +180,10 @@ function App() {
         oneTimeUsed: player.oneTimeUsed,
       })),
     );
+
+    setOfficerMessages(pendingOfficerMessages);
+
+    setPendingOfficerMessages([]);
 
     setNightPlayers(preparedPlayers);
 
@@ -452,6 +464,7 @@ function App() {
           addNightAction={addNightAction}
           nightActions={nightActions}
           stolenRoles={stolenRoles}
+          officerMessages={officerMessages}
         />
       )}
 

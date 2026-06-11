@@ -1,13 +1,4 @@
-const baseRoles = [
-
-  "بيبو ماجيفار",
-
-  "عبده ملقاط",
-
-  "أبو منة",
-
-  "تيسير بيه",
-];
+const baseRoles = ["بيبو ماجيفار", "عبده ملقاط", "أبو منة", "تيسير بيه"];
 
 /*
   ========================
@@ -16,7 +7,6 @@ const baseRoles = [
 */
 
 const extraCriminalRoles = [
-
   "ساهر",
 
   "سيد بشرية",
@@ -47,7 +37,6 @@ const extraCriminalRoles = [
 */
 
 const disguiseRoles = [
-
   "ساهر",
 
   "شعبطة",
@@ -71,16 +60,7 @@ const disguiseRoles = [
   ========================
 */
 
-const policeRoles = [
-
-  "تيسير بيه",
-
-  "أبو منة",
-
-  "زناتي",
-
-  "حودة الغلبان",
-];
+const policeRoles = ["تيسير بيه", "أبو منة", "زناتي", "حودة الغلبان"];
 
 /*
   ========================
@@ -88,10 +68,7 @@ const policeRoles = [
   ========================
 */
 
-const oneTimeRoles = [
-
-  "صبحي صيدلية",
-];
+const oneTimeRoles = ["صبحي صيدلية"];
 
 /*
   ========================
@@ -100,12 +77,7 @@ const oneTimeRoles = [
 */
 
 function shuffle(array) {
-
-  return [...array]
-    .sort(
-      () =>
-        Math.random() - 0.5
-    );
+  return [...array].sort(() => Math.random() - 0.5);
 }
 
 /*
@@ -114,20 +86,14 @@ function shuffle(array) {
   ========================
 */
 
-export function distributeRoles(
-  playerCount
-) {
-
+export function distributeRoles(playerCount) {
   /*
     ========================
     البداية
     ========================
   */
 
-  let roles = [
-
-    ...baseRoles
-  ];
+  let roles = [...baseRoles];
 
   /*
     ========================
@@ -136,10 +102,7 @@ export function distributeRoles(
   */
 
   if (playerCount >= 8) {
-
-    roles.push(
-      "زناتي"
-    );
+    roles.push("زناتي");
   }
 
   /*
@@ -149,10 +112,7 @@ export function distributeRoles(
   */
 
   if (playerCount >= 12) {
-
-    roles.push(
-      "حودة الغلبان"
-    );
+    roles.push("حودة الغلبان");
   }
 
   /*
@@ -161,130 +121,19 @@ export function distributeRoles(
     ========================
   */
 
-  const extraNeeded =
+  const extraNeeded = playerCount - roles.length;
 
-    playerCount -
-    roles.length;
+  const shuffledCriminals = shuffle(extraCriminalRoles);
 
-  const shuffledCriminals =
-
-    shuffle(
-      extraCriminalRoles
-    );
-
-  roles.push(
-
-    ...shuffledCriminals
-      .slice(
-        0,
-        extraNeeded
-      )
-  );
+  roles.push(...shuffledCriminals.slice(0, extraNeeded));
 
   /*
-    ========================
-    فصل الشرطة
-    ========================
-  */
+  ========================
+  Shuffle كامل
+  ========================
+*/
 
-  const police = roles.filter(
-    (role) =>
-      policeRoles.includes(
-        role
-      )
-  );
-
-  const others = roles.filter(
-    (role) =>
-      !policeRoles.includes(
-        role
-      )
-  );
-
-  /*
-    ========================
-    Shuffle للمجرمين فقط
-    ========================
-  */
-
-  const shuffledOthers =
-
-    shuffle(others);
-
-  /*
-    ========================
-    ترتيب الشرطة
-    ========================
-  */
-
-  const orderedPolice = [];
-
-  /*
-    المخبر قبل الظابط
-  */
-
-  if (
-    police.includes(
-      "أبو منة"
-    )
-  ) {
-
-    orderedPolice.push(
-      "أبو منة"
-    );
-  }
-
-  if (
-    police.includes(
-      "تيسير بيه"
-    )
-  ) {
-
-    orderedPolice.push(
-      "تيسير بيه"
-    );
-  }
-
-  /*
-    زناتي
-  */
-
-  if (
-    police.includes(
-      "زناتي"
-    )
-  ) {
-
-    orderedPolice.push(
-      "زناتي"
-    );
-  }
-
-  /*
-    العسكري
-  */
-
-  if (
-    police.includes(
-      "حودة الغلبان"
-    )
-  ) {
-
-    orderedPolice.push(
-      "حودة الغلبان"
-    );
-  }
-
-  /*
-    الدمج النهائي
-  */
-
-  const finalRoles = [
-
-    ...shuffledOthers,
-
-    ...orderedPolice,
-  ];
+  const finalRoles = shuffle(roles);
 
   /*
     ========================
@@ -294,112 +143,69 @@ export function distributeRoles(
 
   const usedDisguises = [];
 
-  return finalRoles.map(
-    (role) => {
-
-      /*
+  return finalRoles.map((role) => {
+    /*
         زناتي مكشوف
       */
 
-      if (
-        role === "زناتي"
-      ) {
+    if (role === "زناتي") {
+      return {
+        realRole: role,
 
-        return {
+        disguise: null,
 
-          realRole:
-            role,
-
-          disguise:
-            null,
-
-          /*
+        /*
             استخدامات خاصة
           */
 
-          oneTimeUsed:
-            false,
-        };
-      }
+        oneTimeUsed: false,
+      };
+    }
 
-      /*
+    /*
         الشرطة
       */
 
-      if (
-        policeRoles.includes(
-          role
-        )
-      ) {
+    if (policeRoles.includes(role)) {
+      const availableDisguises = disguiseRoles.filter(
+        (fakeRole) =>
+          !usedDisguises.includes(fakeRole) && !finalRoles.includes(fakeRole),
+      );
 
-        const availableDisguises =
+      const disguise =
+        availableDisguises[
+          Math.floor(Math.random() * availableDisguises.length)
+        ];
 
-          disguiseRoles.filter(
-            (fakeRole) =>
+      usedDisguises.push(disguise);
 
-              !usedDisguises.includes(
-                fakeRole
-              ) &&
+      return {
+        realRole: role,
 
-              !finalRoles.includes(
-                fakeRole
-              )
-          );
+        disguise,
 
-        const disguise =
-
-          availableDisguises[
-            Math.floor(
-              Math.random() *
-              availableDisguises.length
-            )
-          ];
-
-        usedDisguises.push(
-          disguise
-        );
-
-        return {
-
-          realRole:
-            role,
-
-          disguise,
-
-          /*
+        /*
             استخدامات خاصة
           */
 
-          oneTimeUsed:
-            false,
-        };
-      }
+        oneTimeUsed: false,
+      };
+    }
 
-      /*
+    /*
         المجرمين
       */
 
-      return {
+    return {
+      realRole: role,
 
-        realRole:
-          role,
+      disguise: null,
 
-        disguise:
-          null,
-
-        /*
+      /*
           استخدامات خاصة
         */
 
-        oneTimeUsed:
-          oneTimeRoles.includes(
-            role
-          )
-
-            ? false
-
-            : null,
-      };
-    }
-  );
+      oneTimeUsed: oneTimeRoles.includes(role) ? false : null,
+    };
+  });
 }
