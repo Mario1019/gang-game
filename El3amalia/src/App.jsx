@@ -140,6 +140,8 @@ function App() {
       bulletCount: 1,
 
       oneTimeUsed: roles[index]?.oneTimeUsed,
+
+      delayedBlock: false,
     }));
 
     setPlayersState(initialPlayers);
@@ -178,6 +180,8 @@ function App() {
         bulletCount: player.bulletCount,
 
         oneTimeUsed: player.oneTimeUsed,
+
+        delayedBlock: player.delayedBlock,
       })),
     );
 
@@ -317,6 +321,20 @@ function App() {
         let updatedPlayer = {
           ...player,
         };
+
+        if (updatedPlayer.delayedBlock) {
+          updatedPlayer.delayedBlock = false;
+        }
+
+        const delayedRemoveAction = nightActions.find(
+          (action) =>
+            action.action === "delayedRemove" &&
+            action.target === player.playerName,
+        );
+
+        if (delayedRemoveAction) {
+          updatedPlayer.delayedBlock = true;
+        }
 
         /*
         ========================

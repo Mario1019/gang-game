@@ -664,6 +664,59 @@ function NightScreen({
             افتح دورك 😈
           </button>
         </div>
+      ) : currentTurnPlayer?.delayedBlock ? (
+        <div
+          style={{
+            height: "100vh",
+            background: "#050505",
+            color: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            textAlign: "center",
+            fontFamily: "sans-serif",
+          }}
+        >
+          <h1
+            style={{
+              fontSize: "70px",
+              color: "crimson",
+            }}
+          >
+            ⛔
+          </h1>
+
+          <h2>{currentTurnPlayer.playerName}</h2>
+
+          <p
+            style={{
+              color: "#999",
+              fontSize: "24px",
+            }}
+          >
+            زناتي سبقك بخطوة 😈
+          </p>
+
+          <button
+            onClick={() => {
+              setShowRoleScreen(false);
+              goToNextPlayer();
+            }}
+            style={{
+              marginTop: "40px",
+              background: "crimson",
+              border: "none",
+              color: "white",
+              padding: "20px 45px",
+              borderRadius: "20px",
+              fontSize: "24px",
+              cursor: "pointer",
+            }}
+          >
+            التالي 😈
+          </button>
+        </div>
       ) : (
         <div
           onClick={() => {

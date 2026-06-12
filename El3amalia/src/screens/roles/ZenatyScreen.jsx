@@ -1,8 +1,6 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function ZenatyScreen({
-
   currentPlayer,
 
   allPlayers,
@@ -11,31 +9,13 @@ function ZenatyScreen({
 
   roleOwner,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
+  const [locked, setLocked] = useState(false);
 
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    selectedTime,
-
-    setSelectedTime,
-  ] = useState(null);
-
-  const [
-    locked,
-
-    setLocked,
-  ] = useState(false);
-
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -43,380 +23,142 @@ function ZenatyScreen({
     ========================
   */
 
-  const choosePlayer =
-    (player) => {
+  const choosePlayer = (player) => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    setSelectedPlayer(player.playerName);
 
-        return;
-      }
+    setLocked(true);
 
-      setSelectedPlayer(
-        player.playerName
-      );
-    };
+    addNightAction({
+      role: "زناتي",
 
-  /*
-    ========================
-    اختيار الوقت
-    ========================
-  */
+      actor: roleOwner || currentPlayer.playerName,
 
-  const chooseTime =
-    (time) => {
+      action: "delayedRemove",
 
-      if (
-        locked ||
-        !selectedPlayer
-      ) {
-
-        return;
-      }
-
-      setSelectedTime(
-        time
-      );
-
-      setLocked(true);
-
-      /*
-        تسجيل التأثير
-      */
-
-      addNightAction({
-
-        role:
-          "زناتي",
-
-        actor:
-          roleOwner ||
-currentPlayer.playerName,
-
-        action:
-          "quickDecision",
-
-        target:
-          selectedPlayer,
-
-        duration:
-          time,
-      });
-    };
+      target: player.playerName,
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
-
-        background:
-          "#050505",
-
-        color:
-          "white",
-
-        padding:
-          "30px",
-
-        fontFamily:
-          "sans-serif",
-
-        textAlign:
-          "center",
+        minHeight: "100vh",
+        background: "#050505",
+        color: "white",
+        padding: "30px",
+        fontFamily: "sans-serif",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
-
-          textShadow:
-            "0 0 20px crimson",
+          fontSize: "55px",
+          textShadow: "0 0 20px crimson",
         }}
       >
         زناتي ⏳
       </h1>
 
-      {!selectedPlayer ? (
+      <p
+        style={{
+          marginTop: "20px",
+          color: "#999",
+          fontSize: "24px",
+        }}
+      >
+        اختار لاعب توقفه الليلة القادمة 😈
+      </p>
 
-        <>
+      <div
+        style={{
+          marginTop: "50px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+        }}
+      >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            disabled={locked}
+            onClick={() => choosePlayer(player)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
+              border: "1px solid crimson",
+
+              color: "white",
+
+              padding: "20px",
+
+              borderRadius: "20px",
+
+              fontSize: "24px",
+
+              cursor: "pointer",
+
+              opacity:
+                locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+            }}
+          >
+            {player.playerName}
+          </button>
+        ))}
+      </div>
+
+      {selectedPlayer && (
+        <div
+          style={{
+            marginTop: "50px",
+
+            padding: "22px",
+
+            border: "1px solid crimson",
+
+            borderRadius: "22px",
+
+            background: "#111",
+          }}
+        >
           <p
             style={{
-              marginTop:
-                "20px",
+              color: "#999",
 
-              color:
-                "#999",
-
-              fontSize:
-                "24px",
+              fontSize: "22px",
             }}
           >
-            اختار لاعب تضغطه 😈
+            الهدف المختار
           </p>
-
-          <div
-            style={{
-              marginTop:
-                "50px",
-
-              display:
-                "flex",
-
-              flexDirection:
-                "column",
-
-              gap:
-                "18px",
-            }}
-          >
-
-            {availablePlayers.map(
-              (
-                player,
-                index
-              ) => (
-
-                <button
-                  key={index}
-
-                  disabled={
-                    locked
-                  }
-
-                  onClick={() =>
-                    choosePlayer(
-                      player
-                    )
-                  }
-
-                  style={{
-                    background:
-
-                      selectedPlayer ===
-                      player.playerName
-
-                        ? "crimson"
-
-                        : "#111",
-
-                    border:
-                      "1px solid crimson",
-
-                    color:
-                      "white",
-
-                    padding:
-                      "20px",
-
-                    borderRadius:
-                      "20px",
-
-                    fontSize:
-                      "24px",
-
-                    cursor:
-                      "pointer",
-
-                    opacity:
-
-                      locked &&
-                      selectedPlayer !==
-                        player.playerName
-
-                        ? 0.45
-
-                        : 1,
-                  }}
-                >
-                  {
-                    player.playerName
-                  }
-                </button>
-              )
-            )}
-          </div>
-        </>
-
-      ) : (
-
-        <>
 
           <h2
             style={{
-              marginTop:
-                "40px",
+              marginTop: "12px",
 
-              fontSize:
-                "35px",
+              fontSize: "40px",
+
+              color: "crimson",
             }}
           >
-            قد إيه يتهزق؟
+            {selectedPlayer}
           </h2>
 
-          <div
+          <p
             style={{
-              marginTop:
-                "40px",
+              marginTop: "20px",
 
-              display:
-                "flex",
+              fontSize: "24px",
 
-              gap:
-                "20px",
-
-              justifyContent:
-                "center",
+              color: "#999",
             }}
           >
-
-            <button
-              disabled={locked}
-
-              onClick={() =>
-                chooseTime(30)
-              }
-
-              style={{
-                background:
-
-                  selectedTime ===
-                  30
-
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "25px 40px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "35px",
-
-                cursor:
-                  "pointer",
-              }}
-            >
-              30ث
-            </button>
-
-            <button
-              disabled={locked}
-
-              onClick={() =>
-                chooseTime(15)
-              }
-
-              style={{
-                background:
-
-                  selectedTime ===
-                  15
-
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "25px 40px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "35px",
-
-                cursor:
-                  "pointer",
-              }}
-            >
-              15ث 😈
-            </button>
-          </div>
-
-          <div
-            style={{
-              marginTop:
-                "50px",
-
-              padding:
-                "22px",
-
-              border:
-                "1px solid crimson",
-
-              borderRadius:
-                "22px",
-
-              background:
-                "#111",
-            }}
-          >
-
-            <p
-              style={{
-                color:
-                  "#999",
-
-                fontSize:
-                  "22px",
-              }}
-            >
-              الهدف المختار
-            </p>
-
-            <h2
-              style={{
-                marginTop:
-                  "12px",
-
-                fontSize:
-                  "40px",
-
-                color:
-                  "crimson",
-              }}
-            >
-              {selectedPlayer}
-            </h2>
-
-            {selectedTime && (
-
-              <p
-                style={{
-                  marginTop:
-                    "20px",
-
-                  fontSize:
-                    "28px",
-                }}
-              >
-                الوقت:
-                {" "}
-                {selectedTime}
-                ث
-              </p>
-            )}
-          </div>
-        </>
+            سيتم إيقافه الليلة القادمة 😈
+          </p>
+        </div>
       )}
     </div>
   );
