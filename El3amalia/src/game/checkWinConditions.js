@@ -1,27 +1,13 @@
-const policeRoles = [
-  "تيسير بيه",
-  "أبو منة",
-  "زناتي",
-  "حودة الغلبان",
-];
+const policeRoles = ["تيسير بيه", "أبو منة", "زناتي", "حودة الغلبان"];
 
-export function checkWinConditions(
-  playersState,
-  nightResult
-) {
-
+export function checkWinConditions(playersState, nightResult) {
   /*
     ========================
     اللاعبين الأحياء
     ========================
   */
 
-  const alivePlayers =
-
-    playersState.filter(
-      (player) =>
-        player.alive
-    );
+  const alivePlayers = playersState.filter((player) => player.alive);
 
   /*
     ========================
@@ -29,15 +15,9 @@ export function checkWinConditions(
     ========================
   */
 
-  const alivePolice =
-
-    alivePlayers.filter(
-      (player) =>
-
-        policeRoles.includes(
-          player.role
-        )
-    );
+  const alivePolice = alivePlayers.filter((player) =>
+    policeRoles.includes(player.role),
+  );
 
   /*
     ========================
@@ -45,15 +25,19 @@ export function checkWinConditions(
     ========================
   */
 
-  const aliveCriminals =
+  const aliveCriminals = alivePlayers.filter(
+    (player) => !policeRoles.includes(player.role),
+  );
 
-    alivePlayers.filter(
-      (player) =>
+  /*
+    ========================
+    الظابط حي؟
+    ========================
+  */
 
-        !policeRoles.includes(
-          player.role
-        )
-    );
+  const aliveOfficer = alivePlayers.find(
+    (player) => player.role === "تيسير بيه",
+  );
 
   /*
     ========================
@@ -61,58 +45,26 @@ export function checkWinConditions(
     ========================
   */
 
-  if (
-    aliveCriminals.length ===
-    0
-  ) {
-
+  if (aliveCriminals.length === 0) {
     return {
+      winner: "police",
 
-      winner:
-        "police",
-
-      reason:
-        "allCriminalsRemoved",
+      reason: "allCriminalsRemoved",
     };
   }
 
   /*
     ========================
     فوز العصابة
-    الظابط اتقتل
+    الظابط اتقتل فعلاً
     ========================
   */
 
-  const officerKilled =
-
-    nightResult
-      ?.resolvedActions
-      ?.some(
-        (action) =>
-
-          action.type ===
-            "kill" &&
-
-          playersState.find(
-            (player) =>
-
-              player.playerName ===
-                action.target &&
-
-              player.role ===
-                "تيسير بيه"
-          )
-      );
-
-  if (officerKilled) {
-
+  if (!aliveOfficer) {
     return {
+      winner: "criminals",
 
-      winner:
-        "criminals",
-
-      reason:
-        "officerKilled",
+      reason: "officerKilled",
     };
   }
 
@@ -123,28 +75,11 @@ export function checkWinConditions(
     ========================
   */
 
-  const aliveOfficer =
-
-    alivePlayers.find(
-      (player) =>
-        player.role ===
-        "تيسير بيه"
-    );
-
-  if (
-    aliveOfficer &&
-
-    alivePolice.length ===
-      1
-  ) {
-
+  if (aliveOfficer && alivePolice.length === 1) {
     return {
+      winner: "criminals",
 
-      winner:
-        "criminals",
-
-      reason:
-        "officerAlone",
+      reason: "officerAlone",
     };
   }
 

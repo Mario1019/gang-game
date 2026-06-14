@@ -1,3 +1,5 @@
+import { newspaperTemplates, pickTemplate } from "../game/newspaperTemplates";
+
 function MorningScreen({
   nightResult,
 
@@ -11,54 +13,39 @@ function MorningScreen({
     ========================
   */
 
-  const resolvedKill = nightResult?.resolvedActions?.find(
-    (action) => action.type === "kill",
-  );
+  const newspaperItems = [];
 
-  const resolvedArrest = nightResult?.resolvedActions?.find(
-    (action) => action.type === "arrest",
-  );
+  if (nightResult?.killedPlayer) {
+    const murderText = pickTemplate(newspaperTemplates.MURDER).replace(
+      "{player}",
+      nightResult.killedPlayer,
+    );
 
-  /*
-    ========================
-    عنوان الصباح
-    ========================
-  */
-
-  let morningHeadline = "📰 أخبار عاجلة: ليلة هادئة نسبيًا داخل الحارة";
-
-  /*
-    ========================
-    القتل
-    ========================
-  */
-
-  if (resolvedKill) {
-    morningHeadline = `☠️ العثور على جثة ${resolvedKill.target}`;
+    newspaperItems.push(`☠️ ${murderText}`);
   }
 
-  /*
-    ========================
-    القبض
-    ========================
-  */
-
-  if (resolvedArrest) {
-    morningHeadline = `🚔 تم القبض على ${resolvedArrest.target}`;
+  if (nightResult?.houdaSacrificePlayer) {
+    newspaperItems.push(
+      `☠️ لقي ${nightResult.houdaSacrificePlayer} مصرعه أثناء محاولته حماية أحد السكان.`,
+    );
   }
 
-  /*
-    ========================
-    قتل + قبض
-    ========================
-  */
+  if (nightResult?.arrestedPlayer) {
+    const arrestText = pickTemplate(newspaperTemplates.ARREST).replace(
+      "{player}",
+      nightResult.arrestedPlayer,
+    );
 
-  if (resolvedKill && resolvedArrest) {
-    morningHeadline = `☠️ ${resolvedKill.target} اتقتل
-       و 🚔 ${resolvedArrest.target} اتقبض عليه`;
+    newspaperItems.push(`🚔 ${arrestText}`);
   }
 
-  /*
+  if (nightResult?.meetingTriggered) {
+    newspaperItems.push(`🚨 طالب بعض الأهالي بعقد اجتماع طارئ هذا الصباح.`);
+  }
+
+  if (newspaperItems.length === 0) {
+    newspaperItems.push(`📰 ${pickTemplate(newspaperTemplates.QUIET_NIGHT)}`);
+  } /*
     ========================
     تهريب ناجح
     ========================
@@ -115,17 +102,26 @@ function MorningScreen({
           boxShadow: "0 0 40px rgba(0,0,0,0.7)",
         }}
       >
-        <h2
+        <div
           style={{
-            fontSize: "38px",
-
-            lineHeight: "1.8",
-
-            color: "#ddd",
+            display: "flex",
+            flexDirection: "column",
+            gap: "25px",
           }}
         >
-          {morningHeadline}
-        </h2>
+          {newspaperItems.map((item, index) => (
+            <div
+              key={index}
+              style={{
+                fontSize: "34px",
+                lineHeight: "1.8",
+                color: "#ddd",
+              }}
+            >
+              {item}
+            </div>
+          ))}
+        </div>
 
         {meetingTriggered && (
           <div

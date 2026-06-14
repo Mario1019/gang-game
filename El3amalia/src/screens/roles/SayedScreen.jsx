@@ -47,6 +47,18 @@ function SayedScreen({
 
       setLocked(true);
 
+      addNightAction({
+        role: "سيد بشرية",
+
+        actor: currentPlayer.playerName,
+
+        target: player.playerName,
+
+        action: "stealRole",
+
+        alreadyPlayed: true,
+      });
+
       return;
     }
 
