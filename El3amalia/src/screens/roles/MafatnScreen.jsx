@@ -2,12 +2,10 @@ import { useState } from "react";
 
 function MafatnScreen({
   currentPlayer,
-
   allPlayers,
-
   addNightAction,
-
   roleOwner,
+  playedPlayers = [],
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
@@ -22,26 +20,20 @@ function MafatnScreen({
   */
 
   const chooseTarget = (player) => {
-    /*
-        منع التغيير
-      */
-
     if (selectedPlayer) {
       return;
     }
 
     setSelectedPlayer(player.playerName);
 
-    /*
-        تسجيل التأثير
-      */
+    const alreadyPlayed = playedPlayers.includes(player.playerName);
 
     addNightAction({
       role: "مفاتن",
 
       actor: roleOwner || currentPlayer.playerName,
 
-      action: "pressureChoice",
+      action: alreadyPlayed ? "delayedPressureChoice" : "pressureChoice",
 
       target: player.playerName,
     });
@@ -51,22 +43,16 @@ function MafatnScreen({
     <div
       style={{
         minHeight: "100vh",
-
         background: "#050505",
-
         color: "white",
-
         padding: "30px",
-
         fontFamily: "sans-serif",
-
         textAlign: "center",
       }}
     >
       <h1
         style={{
           fontSize: "55px",
-
           textShadow: "0 0 20px crimson",
         }}
       >
@@ -76,9 +62,7 @@ function MafatnScreen({
       <p
         style={{
           marginTop: "20px",
-
           color: "#999",
-
           fontSize: "24px",
         }}
       >
@@ -90,11 +74,8 @@ function MafatnScreen({
       <div
         style={{
           marginTop: "50px",
-
           display: "flex",
-
           flexDirection: "column",
-
           gap: "18px",
         }}
       >
@@ -134,15 +115,10 @@ function MafatnScreen({
         <div
           style={{
             marginTop: "45px",
-
             background: "#111",
-
             border: "1px solid crimson",
-
             borderRadius: "22px",
-
             padding: "22px",
-
             fontSize: "28px",
           }}
         >
