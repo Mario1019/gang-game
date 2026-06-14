@@ -24,11 +24,13 @@ export function prepareNightData(players) {
 
     delayedBlock: player.delayedBlock || false,
 
+    delayedRemoveFromNight: player.delayedRemoveFromNight || false,
+
     /*
-          ========================
-          استخدامات خاصة
-          ========================
-        */
+      ========================
+      استخدامات خاصة
+      ========================
+    */
 
     oneTimeUsed: player.oneTimeUsed || false,
 
@@ -38,7 +40,7 @@ export function prepareNightData(players) {
   /*
     ========================
     ترتيب الليل
-    بالـpriority
+    بالـ priority
     ========================
   */
 

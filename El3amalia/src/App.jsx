@@ -142,6 +142,8 @@ function App() {
       oneTimeUsed: roles[index]?.oneTimeUsed,
 
       delayedBlock: false,
+
+      delayedRemoveFromNight: false,
     }));
 
     setPlayersState(initialPlayers);
@@ -182,6 +184,8 @@ function App() {
         oneTimeUsed: player.oneTimeUsed,
 
         delayedBlock: player.delayedBlock,
+
+        delayedRemoveFromNight: player.delayedRemoveFromNight,
       })),
     );
 
@@ -295,11 +299,13 @@ function App() {
         nextPlayer?.realRole === "صبحي صيدلية" &&
         nextPlayer?.oneTimeUsed === true;
 
+      const delayedRemovedPlayer = nextPlayer?.delayedRemoveFromNight === true;
+
       /*
           Skip
         */
 
-      if (removedPlayer || sobhyUsed) {
+      if (removedPlayer || delayedRemovedPlayer || sobhyUsed) {
         nextIndex++;
       } else {
         break;
@@ -334,6 +340,20 @@ function App() {
 
         if (delayedRemoveAction) {
           updatedPlayer.delayedBlock = true;
+        }
+
+        if (updatedPlayer.delayedRemoveFromNight) {
+          updatedPlayer.delayedRemoveFromNight = false;
+        }
+
+        const delayedNightRemoveAction = nightActions.find(
+          (action) =>
+            action.action === "delayedRemoveFromNight" &&
+            action.target === player.playerName,
+        );
+
+        if (delayedNightRemoveAction) {
+          updatedPlayer.delayedRemoveFromNight = true;
         }
 
         /*

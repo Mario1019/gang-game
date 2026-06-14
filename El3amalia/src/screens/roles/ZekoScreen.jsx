@@ -1,33 +1,19 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function ZekoScreen({
-
   currentPlayer,
 
   allPlayers,
 
   addNightAction,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
+  const [locked, setLocked] = useState(false);
 
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    locked,
-
-    setLocked,
-  ] = useState(false);
-
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -35,72 +21,51 @@ function ZekoScreen({
     ========================
   */
 
-  const chooseTarget =
-    (player) => {
+  const chooseTarget = (player) => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    setSelectedPlayer(player.playerName);
 
-        return;
-      }
+    setLocked(true);
 
-      setSelectedPlayer(
-        player.playerName
-      );
-
-      setLocked(true);
-
-      /*
+    /*
         تسجيل التأثير
       */
 
-      addNightAction({
+    addNightAction({
+      role: "ذيكو",
 
-        role:
-          "ذيكو",
+      actor: currentPlayer.playerName,
 
-        actor:
-          currentPlayer
-            .playerName,
+      action: "fakeUI",
 
-        action:
-          "fakeUI",
-
-        target:
-          player.playerName,
-      });
-    };
+      target: player.playerName,
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         ذيكو 🎭
@@ -108,133 +73,80 @@ function ZekoScreen({
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
 
-          lineHeight:
-            "1.8",
+          lineHeight: "1.8",
         }}
       >
         اختار لاعب…
         <br />
-        وخلّي الدنيا تلف
-        في عينه 😈
+        وخلّي الدنيا تلف في عينه 😈
       </p>
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            disabled={locked}
+            onClick={() => chooseTarget(player)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-        {availablePlayers.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              disabled={locked}
+              padding: "20px",
 
-              onClick={() =>
-                chooseTarget(
-                  player
-                )
-              }
+              borderRadius: "20px",
 
-              style={{
-                background:
+              fontSize: "24px",
 
-                  selectedPlayer ===
-                  player.playerName
+              cursor: "pointer",
 
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-                  "pointer",
-
-                opacity:
-
-                  locked &&
-                  selectedPlayer !==
-                    player.playerName
-
-                    ? 0.45
-
-                    : 1,
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              opacity:
+                locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+            }}
+          >
+            {player.playerName}
+          </button>
+        ))}
       </div>
 
       {selectedPlayer && (
-
         <div
           style={{
-            marginTop:
-              "45px",
+            marginTop: "45px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            background:
-              "#111",
+            background: "#111",
           }}
         >
-
           <p
             style={{
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
             }}
           >
             الهدف المختار
@@ -242,14 +154,11 @@ function ZekoScreen({
 
           <h2
             style={{
-              marginTop:
-                "12px",
+              marginTop: "12px",
 
-              fontSize:
-                "40px",
+              fontSize: "40px",
 
-              color:
-                "crimson",
+              color: "crimson",
             }}
           >
             {selectedPlayer}

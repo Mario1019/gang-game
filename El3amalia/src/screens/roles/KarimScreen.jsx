@@ -4,38 +4,29 @@ function KarimScreen({
   currentPlayer,
   allPlayers,
   addNightAction,
+  playedPlayers = [],
 }) {
-  const [selectedPlayer, setSelectedPlayer] =
-    useState(null);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
-  const attackPlayer =
-    (player) => {
+  const attackPlayer = (player) => {
+    setSelectedPlayer(player.playerName);
 
-      setSelectedPlayer(
-        player.playerName
-      );
+    const alreadyPlayed = playedPlayers.includes(player.playerName);
 
-      addNightAction({
-        role:
-          "كريم كوشة",
+    addNightAction({
+      role: "كريم كوشة",
 
-        actor:
-          currentPlayer.playerName,
+      actor: currentPlayer.playerName,
 
-        target:
-          player.playerName,
+      target: player.playerName,
 
-        action:
-          "removeFromNight",
-      });
-    };
+      action: alreadyPlayed ? "delayedRemoveFromNight" : "removeFromNight",
+    });
+  };
 
   return (
     <div
@@ -44,17 +35,14 @@ function KarimScreen({
         background: "#050505",
         color: "white",
         padding: "30px",
-        fontFamily:
-          "sans-serif",
-        textAlign:
-          "center",
+        fontFamily: "sans-serif",
+        textAlign: "center",
       }}
     >
       <h1
         style={{
           fontSize: "55px",
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         كريم كوشة 🥷
@@ -70,55 +58,41 @@ function KarimScreen({
       >
         اختار لاعب…
         <br />
-        ويمكن الليلة
-        تختفي تمامًا 😈
+        ويمكن الليلة تختفي تمامًا 😈
       </p>
 
       <div
         style={{
           marginTop: "50px",
           display: "flex",
-          flexDirection:
-            "column",
+          flexDirection: "column",
           gap: "18px",
         }}
       >
-        {availablePlayers.map(
-          (player, index) => (
-            <button
-              key={index}
-              onClick={() =>
-                attackPlayer(
-                  player
-                )
-              }
-              style={{
-                background:
-                  selectedPlayer ===
-                  player.playerName
-                    ? "crimson"
-                    : "#111",
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            onClick={() => attackPlayer(player)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-                border:
-                  "1px solid crimson",
+              border: "1px solid crimson",
 
-                color: "white",
+              color: "white",
 
-                padding: "20px",
+              padding: "20px",
 
-                borderRadius:
-                  "20px",
+              borderRadius: "20px",
 
-                fontSize: "24px",
+              fontSize: "24px",
 
-                cursor:
-                  "pointer",
-              }}
-            >
-              {player.playerName}
-            </button>
-          )
-        )}
+              cursor: "pointer",
+            }}
+          >
+            {player.playerName}
+          </button>
+        ))}
       </div>
 
       {selectedPlayer && (
@@ -127,14 +101,11 @@ function KarimScreen({
             marginTop: "45px",
             padding: "22px",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            background:
-              "#111",
+            background: "#111",
           }}
         >
           <p

@@ -1,8 +1,6 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function MafatnScreen({
-
   currentPlayer,
 
   allPlayers,
@@ -11,19 +9,11 @@ function MafatnScreen({
 
   roleOwner,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -31,76 +21,53 @@ function MafatnScreen({
     ========================
   */
 
-  const chooseTarget =
-    (player) => {
-
-      /*
+  const chooseTarget = (player) => {
+    /*
         منع التغيير
       */
 
-      if (
-        selectedPlayer
-      ) {
+    if (selectedPlayer) {
+      return;
+    }
 
-        return;
-      }
+    setSelectedPlayer(player.playerName);
 
-      setSelectedPlayer(
-        player.playerName
-      );
-
-      /*
+    /*
         تسجيل التأثير
       */
 
-      addNightAction({
+    addNightAction({
+      role: "مفاتن",
 
-        role:
-          "مفاتن",
+      actor: roleOwner || currentPlayer.playerName,
 
-        actor:
-          roleOwner ||
-currentPlayer.playerName,
+      action: "pressureChoice",
 
-        action:
-          "pressureChoice",
-
-        target:
-          player.playerName,
-      });
-    };
+      target: player.playerName,
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         مفاتن 💋
@@ -108,14 +75,11 @@ currentPlayer.playerName,
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
         }}
       >
         اختاري شخص…
@@ -125,117 +89,64 @@ currentPlayer.playerName,
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            disabled={!!selectedPlayer}
+            onClick={() => chooseTarget(player)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-        {availablePlayers.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              disabled={
-                !!selectedPlayer
-              }
+              padding: "20px",
 
-              onClick={() =>
-                chooseTarget(
-                  player
-                )
-              }
+              borderRadius: "20px",
 
-              style={{
-                background:
+              fontSize: "24px",
 
-                  selectedPlayer ===
-                  player.playerName
+              cursor: selectedPlayer ? "default" : "pointer",
 
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-
-                  selectedPlayer
-
-                    ? "default"
-
-                    : "pointer",
-
-                opacity:
-
-                  selectedPlayer &&
-                  selectedPlayer !==
-                    player.playerName
-
-                    ? 0.45
-
-                    : 1,
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              opacity:
+                selectedPlayer && selectedPlayer !== player.playerName
+                  ? 0.45
+                  : 1,
+            }}
+          >
+            {player.playerName}
+          </button>
+        ))}
       </div>
 
       {selectedPlayer && (
-
         <div
           style={{
-            marginTop:
-              "45px",
+            marginTop: "45px",
 
-            background:
-              "#111",
+            background: "#111",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            fontSize:
-              "28px",
+            fontSize: "28px",
           }}
         >
-          💋 تم تشتيت:
-          {" "}
-          {selectedPlayer}
+          💋 تم تشتيت: {selectedPlayer}
         </div>
       )}
     </div>

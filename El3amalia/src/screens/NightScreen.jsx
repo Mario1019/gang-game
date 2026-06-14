@@ -811,6 +811,7 @@ function NightScreen({
                       }
                     }
               }
+              playedPlayers={playedPlayers}
               nightActions={nightActions}
               officerMessages={officerMessages}
               roleOwner={
