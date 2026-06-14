@@ -2,10 +2,9 @@ import { useState } from "react";
 
 function ZekoScreen({
   currentPlayer,
-
   allPlayers,
-
   addNightAction,
+  playedPlayers = [],
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
@@ -30,16 +29,18 @@ function ZekoScreen({
 
     setLocked(true);
 
-    /*
-        تسجيل التأثير
-      */
+    const alreadyPlayed = playedPlayers.includes(player.playerName);
+
+    console.log("ZEKO TARGET", player.playerName, "PLAYED", playedPlayers);
+
+    console.log("ALREADY PLAYED", alreadyPlayed);
 
     addNightAction({
       role: "ذيكو",
 
       actor: currentPlayer.playerName,
 
-      action: "fakeUI",
+      action: alreadyPlayed ? "delayedFakeUI" : "fakeUI",
 
       target: player.playerName,
     });

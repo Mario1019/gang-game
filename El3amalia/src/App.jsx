@@ -59,6 +59,8 @@ function App() {
 
   const [pendingOfficerMessages, setPendingOfficerMessages] = useState([]);
 
+  const [pendingNextNightActions, setPendingNextNightActions] = useState([]);
+
   /*
     ========================
     اجتماع العصابة
@@ -197,7 +199,22 @@ function App() {
 
     setCurrentNightIndex(0);
 
-    setNightActions([]);
+    const activatedActions = pendingNextNightActions.map((action) => ({
+      ...action,
+
+      action:
+        action.action === "delayedFakeUI"
+          ? "fakeUI"
+          : action.action === "delayedCancelRole"
+            ? "cancelRole"
+            : "pressureChoice",
+    }));
+
+    console.log("ACTIVATED ACTIONS", activatedActions);
+
+    setNightActions(activatedActions);
+
+    setPendingNextNightActions([]);
 
     setStolenRoles([]);
 
@@ -317,6 +334,17 @@ function App() {
       */
 
     if (nextIndex >= nightPlayers.length) {
+      const delayedActions = nightActions.filter(
+        (action) =>
+          action.action === "delayedFakeUI" ||
+          action.action === "delayedCancelRole" ||
+          action.action === "delayedPressureChoice",
+      );
+
+      console.log("DELAYED ACTIONS", delayedActions);
+
+      setPendingNextNightActions(delayedActions);
+
       const result = resolveNightActions(nightActions, playersState);
 
       /*
