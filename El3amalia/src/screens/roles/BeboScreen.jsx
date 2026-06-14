@@ -1,8 +1,6 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function BeboScreen({
-
   currentPlayer,
 
   allPlayers,
@@ -11,19 +9,11 @@ function BeboScreen({
 
   roleOwner,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -31,29 +21,19 @@ function BeboScreen({
     ========================
   */
 
-  const choosePlayer =
-    (name) => {
+  const choosePlayer = (name) => {
+    setSelectedPlayer(name);
 
-      setSelectedPlayer(
-        name
-      );
+    addNightAction({
+      actor: currentPlayer.playerName,
 
-      addNightAction({
+      role: "بيبو ماجيفار",
 
-        actor:
-          currentPlayer
-            .playerName,
+      action: "escape",
 
-        role:
-          "بيبو ماجيفار",
-
-        action:
-          "escape",
-
-        target:
-          name,
-      });
-    };
+      target: name,
+    });
+  };
 
   /*
     ========================
@@ -61,63 +41,41 @@ function BeboScreen({
     ========================
   */
 
-  const saveHimself =
-    () => {
+  const saveHimself = () => {
+    setSelectedPlayer(currentPlayer.playerName);
 
-      setSelectedPlayer(
-        currentPlayer
-          .playerName
-      );
+    addNightAction({
+      actor: roleOwner || currentPlayer.playerName,
 
-      addNightAction({
+      role: "بيبو ماجيفار",
 
-        actor:
-          roleOwner ||
-currentPlayer.playerName,
+      action: "escape",
 
-        role:
-          "بيبو ماجيفار",
-
-        action:
-          "escape",
-
-        target:
-          currentPlayer
-            .playerName,
-      });
-    };
+      target: currentPlayer.playerName,
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         بيبو ماجيفار 🚗
@@ -125,17 +83,13 @@ currentPlayer.playerName,
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
 
-          lineHeight:
-            "1.8",
+          lineHeight: "1.8",
         }}
       >
         اختار مين تهرّبه الليلة
@@ -145,108 +99,73 @@ currentPlayer.playerName,
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            onClick={() => choosePlayer(player.playerName)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-        {availablePlayers.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              onClick={() =>
-                choosePlayer(
-                  player.playerName
-                )
-              }
+              padding: "20px",
 
-              style={{
-                background:
+              borderRadius: "20px",
 
-                  selectedPlayer ===
-                  player.playerName
+              fontSize: "24px",
 
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-                  "pointer",
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              cursor: "pointer",
+            }}
+          >
+            {player.zekoMasked ? (
+              <img
+                src="/Images/ذيكو الكاريزما.png"
+                alt="؟؟؟"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                }}
+              />
+            ) : (
+              player.playerName
+            )}
+          </button>
+        ))}
       </div>
 
       <button
-        onClick={
-          saveHimself
-        }
-
+        onClick={saveHimself}
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
           background:
+            selectedPlayer === currentPlayer.playerName ? "crimson" : "#222",
 
-            selectedPlayer ===
-            currentPlayer
-              .playerName
+          border: "1px solid #666",
 
-              ? "crimson"
+          color: "white",
 
-              : "#222",
+          padding: "20px 35px",
 
-          border:
-            "1px solid #666",
+          borderRadius: "20px",
 
-          color:
-            "white",
+          fontSize: "24px",
 
-          padding:
-            "20px 35px",
-
-          borderRadius:
-            "20px",
-
-          fontSize:
-            "24px",
-
-          cursor:
-            "pointer",
+          cursor: "pointer",
         }}
       >
         انفد بجلدك 🏃

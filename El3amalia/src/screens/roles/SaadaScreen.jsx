@@ -1,39 +1,21 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function SaadaScreen({
-
   currentPlayer,
 
   allPlayers,
 
   addNightAction,
 }) {
+  const [message, setMessage] = useState("");
 
-  const [
-    message,
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-    setMessage,
-  ] = useState("");
+  const [investigationLocked, setInvestigationLocked] = useState(false);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    investigationLocked,
-
-    setInvestigationLocked,
-  ] = useState(false);
-
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -41,101 +23,68 @@ function SaadaScreen({
     ========================
   */
 
-  const investigatePlayer =
-    (player) => {
-
-      /*
+  const investigatePlayer = (player) => {
+    /*
         منع التغيير
       */
 
-      if (
-        investigationLocked
-      ) {
+    if (investigationLocked) {
+      return;
+    }
 
-        return;
-      }
-
-      /*
+    /*
         تسجيل الأكشن
       */
 
-      addNightAction({
+    addNightAction({
+      role: "سعدة",
 
-        role:
-          "سعدة",
+      actor: currentPlayer.playerName,
 
-        actor:
-          currentPlayer.playerName,
+      target: player.playerName,
 
-        target:
-          player.playerName,
+      action: "investigateInformer",
+    });
 
-        action:
-          "investigateInformer",
-      });
+    setSelectedPlayer(player.playerName);
 
-      setSelectedPlayer(
-        player.playerName
-      );
+    setInvestigationLocked(true);
 
-      setInvestigationLocked(
-        true
-      );
-
-      /*
+    /*
         المخبر
       */
 
-      if (
-        player.realRole ===
-        "أبو منة"
-      ) {
-
-        setMessage(
-
-          `${player.playerName}
-           هو المخبر 😈`
-        );
-
-      } else {
-
-        setMessage(
-          "دور تاني ع المخبر 😭"
-        );
-      }
-    };
+    if (player.realRole === "أبو منة") {
+      setMessage(
+        `${player.playerName}
+           هو المخبر 😈`,
+      );
+    } else {
+      setMessage("دور تاني ع المخبر 😭");
+    }
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         سعدة 👁️
@@ -143,14 +92,11 @@ function SaadaScreen({
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
         }}
       >
         دوري ع المخبر 😈
@@ -158,113 +104,76 @@ function SaadaScreen({
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            disabled={investigationLocked}
+            onClick={() => investigatePlayer(player)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-        {availablePlayers.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              disabled={
-                investigationLocked
-              }
+              padding: "20px",
 
-              onClick={() =>
-                investigatePlayer(
-                  player
-                )
-              }
+              borderRadius: "20px",
 
-              style={{
-                background:
+              fontSize: "24px",
 
-                  selectedPlayer ===
-                  player.playerName
+              cursor: investigationLocked ? "default" : "pointer",
 
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-
-                  investigationLocked
-                    ? "default"
-                    : "pointer",
-
-                opacity:
-
-                  investigationLocked &&
-                  selectedPlayer !==
-                    player.playerName
-
-                    ? 0.45
-
-                    : 1,
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              opacity:
+                investigationLocked && selectedPlayer !== player.playerName
+                  ? 0.45
+                  : 1,
+            }}
+          >
+            {player.zekoMasked ? (
+              <img
+                src="/Images/ذيكو الكاريزما.png"
+                alt="؟؟؟"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                }}
+              />
+            ) : (
+              player.playerName
+            )}{" "}
+          </button>
+        ))}
       </div>
 
       {message && (
-
         <div
           style={{
-            marginTop:
-              "45px",
+            marginTop: "45px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            background:
-              "#111",
+            background: "#111",
 
-            fontSize:
-              "30px",
+            fontSize: "30px",
 
-            lineHeight:
-              "1.8",
+            lineHeight: "1.8",
           }}
         >
           {message}

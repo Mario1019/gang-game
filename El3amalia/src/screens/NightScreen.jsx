@@ -38,7 +38,28 @@ function NightScreen({
 
   const [targetPlayer, setTargetPlayer] = useState(null);
 
+  const [fakePlayersSnapshot, setFakePlayersSnapshot] = useState([]);
+
   const [showVictimScreen, setShowVictimScreen] = useState(false);
+
+  /*========================ذيكو========================*/
+
+  const fakeUIAction = nightActions.find(
+    (action) =>
+      action.action === "fakeUI" &&
+      action.target === currentTurnPlayer.playerName,
+  );
+
+  useEffect(() => {
+    if (!fakeUIAction) {
+      setFakePlayersSnapshot([]);
+      return;
+    }
+
+    const shuffled = [...nightPlayers].sort(() => Math.random() - 0.5);
+
+    setFakePlayersSnapshot(shuffled);
+  }, [fakeUIAction, currentTurnPlayer?.playerName]);
 
   /*========================لو اللاعب الحالياستخدم قدرته========================*/
 
@@ -404,19 +425,26 @@ function NightScreen({
     );
   }
 
+  if (currentTurnPlayer?.delayedRemoveFromNight) {
+    setTimeout(() => {
+      goToNextPlayer();
+    }, 100);
+
+    return null;
+  }
+  /*====================== زناتي ========================*/
+
+  const instantZenatyAction = nightActions.find(
+    (action) =>
+      action.action === "instantDelayedBlock" &&
+      action.target === currentTurnPlayer.playerName,
+  );
+
   /*========================وحيد الفاجر========================*/
 
   const cancelledAction = nightActions.find(
     (action) =>
       action.action === "cancelRole" &&
-      action.target === currentTurnPlayer.playerName,
-  );
-
-  /*========================ذيكو========================*/
-
-  const fakeUIAction = nightActions.find(
-    (action) =>
-      action.action === "fakeUI" &&
       action.target === currentTurnPlayer.playerName,
   );
 
@@ -434,22 +462,12 @@ function NightScreen({
 
   /*========================Fake Players========================*/
 
-  let displayedPlayers = [...nightPlayers];
-
-  if (fakeUIAction) {
-    displayedPlayers = [...nightPlayers]
-      .sort(() => Math.random() - 0.5)
-      .map((player) => ({
+  let displayedPlayers = fakeUIAction
+    ? fakePlayersSnapshot.map((player) => ({
         ...player,
-
-        playerName:
-          Math.random() > 0.5
-            ? player.playerName
-            : nightPlayers[Math.floor(Math.random() * nightPlayers.length)]
-                .playerName,
-      }));
-  }
-
+        zekoMasked: true,
+      }))
+    : nightPlayers;
   /*========================تااااكس========================*/
 
   if (taxTriggered) {
@@ -481,15 +499,25 @@ function NightScreen({
           fontFamily: "sans-serif",
         }}
       >
+        <img
+          src="/Images/وح وح.png"
+          alt="وح وح"
+          style={{
+            width: "280px",
+            height: "280px",
+            objectFit: "cover",
+            borderRadius: "24px",
+            border: "3px solid crimson",
+            boxShadow: "0 0 35px crimson",
+          }}
+        />
+
         <h1
           style={{
-            fontSize: "120px",
-
+            marginTop: "20px",
+            fontSize: "70px",
             color: "crimson",
-
             textShadow: "0 0 40px crimson",
-
-            transform: "rotate(-6deg)",
           }}
         >
           ✋ تااااكس
@@ -526,15 +554,18 @@ function NightScreen({
           padding: "20px",
         }}
       >
-        <h1
+        <img
+          src="/Images/سيد بشرية.png"
+          alt="سيد بشرية"
           style={{
-            fontSize: "70px",
-            color: "crimson",
-            textShadow: "0 0 20px crimson",
+            width: "280px",
+            height: "280px",
+            objectFit: "cover",
+            borderRadius: "24px",
+            border: "3px solid crimson",
+            boxShadow: "0 0 35px crimson",
           }}
-        >
-          😈
-        </h1>
+        />
 
         <h2
           style={{
@@ -664,7 +695,7 @@ function NightScreen({
             افتح دورك 😈
           </button>
         </div>
-      ) : currentTurnPlayer?.delayedBlock ? (
+      ) : currentTurnPlayer?.delayedBlock || instantZenatyAction ? (
         <div
           style={{
             height: "100vh",
@@ -678,14 +709,18 @@ function NightScreen({
             fontFamily: "sans-serif",
           }}
         >
-          <h1
+          <img
+            src="/Images/زناتي.png"
+            alt="زناتي"
             style={{
-              fontSize: "70px",
-              color: "crimson",
+              width: "280px",
+              height: "280px",
+              objectFit: "cover",
+              borderRadius: "24px",
+              border: "3px solid crimson",
+              boxShadow: "0 0 35px crimson",
             }}
-          >
-            ⛔
-          </h1>
+          />
 
           <h2>{currentTurnPlayer.playerName}</h2>
 
@@ -784,28 +819,12 @@ function NightScreen({
                           (p) => p.playerName === action.target,
                         );
 
-                        console.log("TARGET PLAYER:", tp);
-
                         setTargetPlayer(tp);
-
-                        const undercoverPoliceRoles = [
-                          "تيسير بيه",
-                          "أبو منة",
-                          "حودة الغلبان",
-                        ];
-
-                        console.log("STEAL DEBUG:", {
-                          playerName: tp.playerName,
-                          realRole: tp.realRole,
-                          disguise: tp.disguise,
-                        });
 
                         setSecondaryRoleData({
                           role: tp.disguise || tp.realRole,
                           player: controllerPlayer,
                         });
-
-                        console.log("SECONDARY ROLE SET:", tp.realRole);
 
                         setShowRoleScreen(false);
                       }

@@ -7,43 +7,29 @@ function AbuMenaScreen({
   addNightAction,
   roleOwner,
 }) {
-  const [selectedPlayer, setSelectedPlayer] =
-    useState(null);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const availablePlayers =
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
-  const investigatedPlayer =
-    allPlayers.find(
-      (player) =>
-        player.playerName ===
-        selectedPlayer
-    );
+  const investigatedPlayer = allPlayers.find(
+    (player) => player.playerName === selectedPlayer,
+  );
 
-  const choosePlayer = (
-    playerName
-  ) => {
-    setSelectedPlayer(
-      playerName
-    );
+  const choosePlayer = (playerName) => {
+    setSelectedPlayer(playerName);
 
     addNightAction({
       role: "أبو منة",
 
-      actor:
-  roleOwner ||
-  currentPlayer.playerName,
+      actor: roleOwner || currentPlayer.playerName,
 
       target: playerName,
 
       action: "intel",
 
-      message:
-        `خد بالك يا باشا من ${playerName}`,
+      message: `خد بالك يا باشا من ${playerName}`,
     });
   };
 
@@ -61,8 +47,7 @@ function AbuMenaScreen({
       <h1
         style={{
           fontSize: "55px",
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         أبو منة 🕵️
@@ -88,41 +73,42 @@ function AbuMenaScreen({
               gap: "20px",
             }}
           >
-            {availablePlayers.map(
-              (player, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    choosePlayer(
-                      player.playerName
-                    )
-                  }
-                  style={{
-                    background:
-                      "#111",
+            {availablePlayers.map((player, index) => (
+              <button
+                key={index}
+                onClick={() => choosePlayer(player.playerName)}
+                style={{
+                  background: "#111",
 
-                    border:
-                      "1px solid crimson",
+                  border: "1px solid crimson",
 
-                    color: "white",
+                  color: "white",
 
-                    padding:
-                      "20px",
+                  padding: "20px",
 
-                    borderRadius:
-                      "20px",
+                  borderRadius: "20px",
 
-                    fontSize:
-                      "24px",
+                  fontSize: "24px",
 
-                    cursor:
-                      "pointer",
-                  }}
-                >
-                  {player.playerName}
-                </button>
-              )
-            )}
+                  cursor: "pointer",
+                }}
+              >
+                {player.zekoMasked ? (
+                  <img
+                    src="/Images/ذيكو الكاريزما.png"
+                    alt="؟؟؟"
+                    style={{
+                      width: "90px",
+                      height: "90px",
+                      objectFit: "cover",
+                      borderRadius: "12px",
+                    }}
+                  />
+                ) : (
+                  player.playerName
+                )}{" "}
+              </button>
+            ))}
           </div>
         </>
       ) : (
@@ -133,20 +119,16 @@ function AbuMenaScreen({
               fontSize: "35px",
             }}
           >
-            الحقيقة الكاملة لـ
-            {" "}
-            {selectedPlayer}
+            الحقيقة الكاملة لـ {selectedPlayer}
           </h2>
 
           <div
             style={{
               marginTop: "30px",
               padding: "25px",
-              border:
-                "1px solid crimson",
+              border: "1px solid crimson",
 
-              borderRadius:
-                "25px",
+              borderRadius: "25px",
 
               background: "#111",
             }}
@@ -156,10 +138,7 @@ function AbuMenaScreen({
                 fontSize: "50px",
               }}
             >
-              {
-                investigatedPlayer
-                  ?.realRole
-              }
+              {investigatedPlayer?.realRole}
             </h1>
 
             <p
@@ -169,14 +148,7 @@ function AbuMenaScreen({
                 fontSize: "28px",
               }}
             >
-              (
-              {
-                rolesData[
-                  investigatedPlayer
-                    ?.realRole
-                ]?.title
-              }
-              )
+              ({rolesData[investigatedPlayer?.realRole]?.title})
             </p>
           </div>
 
@@ -184,11 +156,9 @@ function AbuMenaScreen({
             style={{
               marginTop: "50px",
               padding: "20px",
-              border:
-                "1px solid #444",
+              border: "1px solid #444",
 
-              borderRadius:
-                "20px",
+              borderRadius: "20px",
 
               background: "#111",
             }}
@@ -199,8 +169,7 @@ function AbuMenaScreen({
                 marginBottom: "15px",
               }}
             >
-              الرسالة اللي هتوصل
-              للظابط:
+              الرسالة اللي هتوصل للظابط:
             </h3>
 
             <p
@@ -210,9 +179,7 @@ function AbuMenaScreen({
                 lineHeight: "1.8",
               }}
             >
-              خد بالك يا باشا من
-              {" "}
-              {selectedPlayer}
+              خد بالك يا باشا من {selectedPlayer}
             </p>
           </div>
         </>

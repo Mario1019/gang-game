@@ -197,6 +197,8 @@ function App() {
 
     setNightPlayers(preparedPlayers);
 
+    console.log("FIRST PLAYER", preparedPlayers[0]);
+
     setCurrentNightIndex(0);
 
     const activatedActions = pendingNextNightActions.map((action) => ({

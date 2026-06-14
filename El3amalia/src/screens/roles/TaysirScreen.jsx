@@ -226,7 +226,20 @@ function TaysirScreen({
                 locked && selectedPlayer !== player.playerName ? 0.45 : 1,
             }}
           >
-            {player.playerName}
+            {player.zekoMasked ? (
+              <img
+                src="/Images/ذيكو الكاريزما.png"
+                alt="؟؟؟"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                }}
+              />
+            ) : (
+              player.playerName
+            )}{" "}
           </button>
         ))}
       </div>

@@ -1,29 +1,17 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
 function HamadaScreen({
-
   currentPlayer,
 
   allPlayers,
 
   addNightAction,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
-
-    setSelectedPlayer
-  ] = useState(null);
-
-  const availablePlayers =
-
-    allPlayers.filter(
-      (player) =>
-
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -31,64 +19,45 @@ function HamadaScreen({
     ========================
   */
 
-  const protectPlayer =
-    (player) => {
-
-      /*
+  const protectPlayer = (player) => {
+    /*
         تسجيل الأكشن
       */
 
-      addNightAction({
+    addNightAction({
+      role: "حمادة كلهم",
 
-        role:
-          "حمادة كلهم",
+      actor: currentPlayer.playerName,
 
-        actor:
-          currentPlayer.playerName,
+      target: player.playerName,
 
-        target:
-          player.playerName,
+      action: "sacrificeProtection",
+    });
 
-        action:
-          "sacrificeProtection",
-      });
-
-      setSelectedPlayer(
-        player.playerName
-      );
-    };
+    setSelectedPlayer(player.playerName);
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         حمادة كلهم 🛡️
@@ -96,143 +65,104 @@ function HamadaScreen({
 
       <p
         style={{
-          marginTop:
-            "20px",
+          marginTop: "20px",
 
-          color:
-            "#999",
+          color: "#999",
 
-          fontSize:
-            "24px",
+          fontSize: "24px",
 
-          lineHeight:
-            "1.8",
+          lineHeight: "1.8",
         }}
       >
         اختار شخص…
         <br />
-
-        ولو وقع الليلة
-        هتقع مكانه 😈
+        ولو وقع الليلة هتقع مكانه 😈
       </p>
 
       <div
         style={{
-          marginTop:
-            "50px",
+          marginTop: "50px",
 
-          display:
-            "flex",
+          display: "flex",
 
-          flexDirection:
-            "column",
+          flexDirection: "column",
 
-          gap:
-            "18px",
+          gap: "18px",
         }}
       >
+        {availablePlayers.map((player, index) => (
+          <button
+            key={index}
+            onClick={() => protectPlayer(player)}
+            style={{
+              background:
+                selectedPlayer === player.playerName ? "crimson" : "#111",
 
-        {availablePlayers.map(
-          (
-            player,
-            index
-          ) => (
+              border: "1px solid crimson",
 
-            <button
-              key={index}
+              color: "white",
 
-              onClick={() =>
-                protectPlayer(
-                  player
-                )
-              }
+              padding: "20px",
 
-              style={{
-                background:
+              borderRadius: "20px",
 
-                  selectedPlayer ===
-                  player.playerName
+              fontSize: "24px",
 
-                    ? "crimson"
-
-                    : "#111",
-
-                border:
-                  "1px solid crimson",
-
-                color:
-                  "white",
-
-                padding:
-                  "20px",
-
-                borderRadius:
-                  "20px",
-
-                fontSize:
-                  "24px",
-
-                cursor:
-                  "pointer",
-              }}
-            >
-              {
-                player.playerName
-              }
-            </button>
-          )
-        )}
+              cursor: "pointer",
+            }}
+          >
+            {player.zekoMasked ? (
+              <img
+                src="/Images/ذيكو الكاريزما.png"
+                alt="؟؟؟"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                }}
+              />
+            ) : (
+              player.playerName
+            )}
+          </button>
+        ))}
       </div>
 
       {selectedPlayer && (
-
         <div
           style={{
-            marginTop:
-              "45px",
+            marginTop: "45px",
 
-            padding:
-              "22px",
+            padding: "22px",
 
-            border:
-              "1px solid crimson",
+            border: "1px solid crimson",
 
-            borderRadius:
-              "22px",
+            borderRadius: "22px",
 
-            background:
-              "#111",
+            background: "#111",
           }}
         >
-
           <p
             style={{
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "22px",
+              fontSize: "22px",
             }}
           >
-            الشخص اللي
-            هتفديه
+            الشخص اللي هتفديه
           </p>
 
           <h2
             style={{
-              marginTop:
-                "12px",
+              marginTop: "12px",
 
-              fontSize:
-                "40px",
+              fontSize: "40px",
 
-              color:
-                "crimson",
+              color: "crimson",
             }}
           >
-            {
-              selectedPlayer
-            }
+            {selectedPlayer}
           </h2>
         </div>
       )}

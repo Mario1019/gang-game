@@ -2,12 +2,10 @@ import { useState } from "react";
 
 function ZenatyScreen({
   currentPlayer,
-
   allPlayers,
-
   addNightAction,
-
   roleOwner,
+  playedPlayers = [],
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
@@ -32,12 +30,12 @@ function ZenatyScreen({
 
     setLocked(true);
 
+    const alreadyPlayed = playedPlayers.includes(player.playerName);
+
     addNightAction({
       role: "زناتي",
-
       actor: roleOwner || currentPlayer.playerName,
-
-      action: "delayedRemove",
+      action: alreadyPlayed ? "delayedRemove" : "instantDelayedBlock",
 
       target: player.playerName,
     });
@@ -106,7 +104,20 @@ function ZenatyScreen({
                 locked && selectedPlayer !== player.playerName ? 0.45 : 1,
             }}
           >
-            {player.playerName}
+            {player.zekoMasked ? (
+              <img
+                src="/Images/ذيكو الكاريزما.png"
+                alt="؟؟؟"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                }}
+              />
+            ) : (
+              player.playerName
+            )}{" "}
           </button>
         ))}
       </div>

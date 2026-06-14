@@ -93,7 +93,20 @@ function WaheedScreen({
               transition: "0.2s",
             }}
           >
-            {player.playerName}
+            {player.zekoMasked ? (
+              <img
+                src="/Images/ذيكو الكاريزما.png"
+                alt="؟؟؟"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                }}
+              />
+            ) : (
+              player.playerName
+            )}{" "}
           </button>
         ))}
       </div>

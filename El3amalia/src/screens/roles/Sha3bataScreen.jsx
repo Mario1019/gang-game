@@ -72,7 +72,7 @@ function Sha3bataScreen({
 
     startSecondaryRolePhase({
       player: currentPlayer,
-      role: player.realRole,
+      role: player.disguise || player.realRole,
       targetPlayer: player,
       phaseType: "copy",
     });

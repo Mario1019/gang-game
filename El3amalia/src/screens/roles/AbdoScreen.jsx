@@ -1,11 +1,8 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
-import { rolesData }
-from "../../game/roles";
+import { rolesData } from "../../game/roles";
 
 function AbdoScreen({
-
   currentPlayer,
 
   allPlayers,
@@ -14,24 +11,11 @@ function AbdoScreen({
 
   roleOwner,
 }) {
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [
-    selectedPlayer,
+  const [sendName, setSendName] = useState(null);
 
-    setSelectedPlayer,
-  ] = useState(null);
-
-  const [
-    sendName,
-
-    setSendName,
-  ] = useState(null);
-
-  const [
-    locked,
-
-    setLocked,
-  ] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   /*
     ========================
@@ -39,12 +23,7 @@ function AbdoScreen({
     ========================
   */
 
-  const realActor =
-
-    roleOwner ||
-
-    currentPlayer
-      .playerName;
+  const realActor = roleOwner || currentPlayer.playerName;
 
   /*
     ========================
@@ -52,13 +31,9 @@ function AbdoScreen({
     ========================
   */
 
-  const availablePlayers =
-
-    allPlayers.filter(
-      (player) =>
-        player.playerName !==
-        currentPlayer.playerName
-    );
+  const availablePlayers = allPlayers.filter(
+    (player) => player.playerName !== currentPlayer.playerName,
+  );
 
   /*
     ========================
@@ -66,13 +41,9 @@ function AbdoScreen({
     ========================
   */
 
-  const stolenPlayer =
-
-    allPlayers.find(
-      (player) =>
-        player.playerName ===
-        selectedPlayer
-    );
+  const stolenPlayer = allPlayers.find(
+    (player) => player.playerName === selectedPlayer,
+  );
 
   /*
     ========================
@@ -80,96 +51,67 @@ function AbdoScreen({
     ========================
   */
 
-  const chooseFakeMessage =
-    (playerName) => {
+  const chooseFakeMessage = (playerName) => {
+    if (locked) {
+      return;
+    }
 
-      if (locked) {
+    setSendName(playerName);
 
-        return;
-      }
+    setLocked(true);
 
-      setSendName(
-        playerName
-      );
+    addNightAction({
+      role: "عبده ملقاط",
 
-      setLocked(true);
+      actor: realActor,
 
-      addNightAction({
+      target: selectedPlayer,
 
-        role:
-          "عبده ملقاط",
+      fakeTarget: playerName,
 
-        actor:
-          realActor,
+      discoveredRole: stolenPlayer?.realRole,
 
-        target:
-          selectedPlayer,
+      action: "stealIntel",
 
-        fakeTarget:
-          playerName,
-
-        discoveredRole:
-          stolenPlayer
-            ?.realRole,
-
-        action:
-          "stealIntel",
-
-        message:
-          `خد بالك يا باشا من ${playerName}`,
-      });
-    };
+      message: `خد بالك يا باشا من ${playerName}`,
+    });
+  };
 
   return (
-
     <div
       style={{
-        minHeight:
-          "100vh",
+        minHeight: "100vh",
 
-        background:
-          "#050505",
+        background: "#050505",
 
-        color:
-          "white",
+        color: "white",
 
-        padding:
-          "30px",
+        padding: "30px",
 
-        fontFamily:
-          "sans-serif",
+        fontFamily: "sans-serif",
 
-        textAlign:
-          "center",
+        textAlign: "center",
       }}
     >
-
       <h1
         style={{
-          fontSize:
-            "55px",
+          fontSize: "55px",
 
-          textShadow:
-            "0 0 20px crimson",
+          textShadow: "0 0 20px crimson",
         }}
       >
         عبده ملقاط 🧤
       </h1>
 
       {!selectedPlayer ? (
-
         <>
-
           <p
             style={{
-              marginTop:
-                "20px",
+              marginTop: "20px",
 
-              color:
-                "#999",
+              color: "#999",
 
-              fontSize:
-                "24px",
+              fontSize: "24px",
             }}
           >
             اختار لاعب تنشله
@@ -177,148 +119,105 @@ function AbdoScreen({
 
           <div
             style={{
-              marginTop:
-                "50px",
+              marginTop: "50px",
 
-              display:
-                "flex",
+              display: "flex",
 
-              flexDirection:
-                "column",
+              flexDirection: "column",
 
-              gap:
-                "20px",
+              gap: "20px",
             }}
           >
+            {availablePlayers.map((player, index) => (
+              <button
+                key={index}
+                disabled={locked}
+                onClick={() => setSelectedPlayer(player.playerName)}
+                style={{
+                  background: "#111",
 
-            {availablePlayers.map(
-              (
-                player,
-                index
-              ) => (
+                  border: "1px solid crimson",
 
-                <button
-                  key={index}
+                  color: "white",
 
-                  disabled={locked}
+                  padding: "20px",
 
-                  onClick={() =>
-                    setSelectedPlayer(
-                      player.playerName
-                    )
-                  }
+                  borderRadius: "20px",
 
-                  style={{
-                    background:
-                      "#111",
+                  fontSize: "24px",
 
-                    border:
-                      "1px solid crimson",
-
-                    color:
-                      "white",
-
-                    padding:
-                      "20px",
-
-                    borderRadius:
-                      "20px",
-
-                    fontSize:
-                      "24px",
-
-                    cursor:
-                      "pointer",
-                  }}
-                >
-                  {
-                    player.playerName
-                  }
-                </button>
-              )
-            )}
+                  cursor: "pointer",
+                }}
+              >
+                {player.zekoMasked ? (
+                  <img
+                    src="/Images/ذيكو الكاريزما.png"
+                    alt="؟؟؟"
+                    style={{
+                      width: "90px",
+                      height: "90px",
+                      objectFit: "cover",
+                      borderRadius: "12px",
+                    }}
+                  />
+                ) : (
+                  player.playerName
+                )}
+              </button>
+            ))}
           </div>
         </>
-
       ) : (
-
         <>
-
           <h2
             style={{
-              marginTop:
-                "20px",
+              marginTop: "20px",
 
-              fontSize:
-                "35px",
+              fontSize: "35px",
             }}
           >
-            الدور الحقيقي لـ
-            {" "}
-            {selectedPlayer}
+            الدور الحقيقي لـ {selectedPlayer}
           </h2>
 
           <div
             style={{
-              marginTop:
-                "30px",
+              marginTop: "30px",
 
-              padding:
-                "25px",
+              padding: "25px",
 
-              border:
-                "1px solid crimson",
+              border: "1px solid crimson",
 
-              borderRadius:
-                "25px",
+              borderRadius: "25px",
 
-              background:
-                "#111",
+              background: "#111",
             }}
           >
-
             <h1
               style={{
-                fontSize:
-                  "50px",
+                fontSize: "50px",
               }}
             >
-              {
-                stolenPlayer
-                  ?.realRole
-              }
+              {stolenPlayer?.realRole}
             </h1>
 
             <p
               style={{
-                marginTop:
-                  "15px",
+                marginTop: "15px",
 
-                color:
-                  "crimson",
+                color: "crimson",
 
-                fontSize:
-                  "28px",
+                fontSize: "28px",
               }}
             >
-              (
-              {
-                rolesData[
-                  stolenPlayer
-                    ?.realRole
-                ]?.title
-              }
-              )
+              ({rolesData[stolenPlayer?.realRole]?.title})
             </p>
           </div>
 
           <h3
             style={{
-              marginTop:
-                "50px",
+              marginTop: "50px",
 
-              fontSize:
-                "30px",
+              fontSize: "30px",
             }}
           >
             ابعت تحذير لمين؟
@@ -326,84 +225,42 @@ function AbdoScreen({
 
           <div
             style={{
-              marginTop:
-                "30px",
+              marginTop: "30px",
 
-              display:
-                "flex",
+              display: "flex",
 
-              flexDirection:
-                "column",
+              flexDirection: "column",
 
-              gap:
-                "18px",
+              gap: "18px",
             }}
           >
+            {availablePlayers.map((player, index) => (
+              <button
+                key={index}
+                disabled={locked}
+                onClick={() => chooseFakeMessage(player.playerName)}
+                style={{
+                  background:
+                    sendName === player.playerName ? "crimson" : "#111",
 
-            {availablePlayers.map(
-              (
-                player,
-                index
-              ) => (
+                  border: "1px solid crimson",
 
-                <button
-                  key={index}
+                  color: "white",
 
-                  disabled={locked}
+                  padding: "18px",
 
-                  onClick={() =>
-                    chooseFakeMessage(
-                      player.playerName
-                    )
-                  }
+                  borderRadius: "18px",
 
-                  style={{
-                    background:
+                  fontSize: "22px",
 
-                      sendName ===
-                      player.playerName
+                  cursor: "pointer",
 
-                        ? "crimson"
-
-                        : "#111",
-
-                    border:
-                      "1px solid crimson",
-
-                    color:
-                      "white",
-
-                    padding:
-                      "18px",
-
-                    borderRadius:
-                      "18px",
-
-                    fontSize:
-                      "22px",
-
-                    cursor:
-                      "pointer",
-
-                    opacity:
-
-                      locked &&
-                      sendName !==
-                        player.playerName
-
-                        ? 0.45
-
-                        : 1,
-                  }}
-                >
-                  خد بالك يا باشا من
-                  {" "}
-                  {
-                    player.playerName
-                  }
-                </button>
-              )
-            )}
+                  opacity: locked && sendName !== player.playerName ? 0.45 : 1,
+                }}
+              >
+                خد بالك يا باشا من {player.playerName}
+              </button>
+            ))}
           </div>
         </>
       )}
