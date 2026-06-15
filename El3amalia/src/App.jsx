@@ -100,7 +100,13 @@ function App() {
       setPendingOfficerMessages((prev) => [...prev, action]);
     }
 
-    setNightActions((prev) => [...prev, action]);
+    setNightActions((prev) => {
+      const filtered = prev.filter(
+        (a) => !(a.actor === action.actor && a.action === action.action),
+      );
+
+      return [...filtered, action];
+    });
   };
 
   /*
