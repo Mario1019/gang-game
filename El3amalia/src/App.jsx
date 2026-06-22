@@ -509,6 +509,7 @@ function App() {
           players={players}
           setPlayers={setPlayers}
           goToReady={() => setScreen("ready")}
+          goBack={() => setScreen("settings")}
         />
       )}
 
@@ -564,7 +565,28 @@ function App() {
       )}
 
       {screen === "gameOver" && (
-        <GameOverScreen gameResult={gameResult} playersState={playersState} />
+        <GameOverScreen
+          gameResult={gameResult}
+          playersState={playersState}
+          startNewGame={() => {
+            setPlayers([]);
+            setPlayersState([]);
+            setAssignedRoles([]);
+            setNightPlayers([]);
+            setNightActions([]);
+            setStolenRoles([]);
+            setOfficerMessages([]);
+            setPendingOfficerMessages([]);
+            setPendingNextNightActions([]);
+            setPlayedPlayers([]);
+            setNightResult(null);
+            setGameResult(null);
+            setMeetingTriggered(false);
+            setCurrentNightIndex(0);
+
+            setScreen("settings");
+          }}
+        />
       )}
     </>
   );

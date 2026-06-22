@@ -3,75 +3,42 @@ function SplashScreen({ goToSettings }) {
     <div
       style={{
         height: "100vh",
-        background:
-          "radial-gradient(circle at top, #1a1a1a, #050505)",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        color: "white",
-        fontFamily: "sans-serif",
+        width: "100vw",
+        position: "relative",
+        overflow: "hidden",
+        background: "#000",
       }}
     >
-      <div
+      <img
+        src="/Images/splash-screen.png"
+        alt="Splash"
         style={{
-          display: "flex",
-          gap: "30px",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
         }}
-      >
-        <div
-          style={{
-            width: "90px",
-            height: "45px",
-            background: "white",
-            borderRadius: "50%",
-          }}
-        ></div>
-
-        <div
-          style={{
-            width: "90px",
-            height: "45px",
-            background: "white",
-            borderRadius: "50%",
-          }}
-        ></div>
-      </div>
-
-      <h1
-        style={{
-          fontSize: "75px",
-          marginTop: "30px",
-          textShadow: "0 0 20px crimson",
-        }}
-      >
-        العملية
-      </h1>
-
-      <p
-        style={{
-          color: "#888",
-          marginBottom: "40px",
-        }}
-      >
-        محدش هنا بريء
-      </p>
+      />
 
       <button
         onClick={goToSettings}
         style={{
-          background: "crimson",
+          position: "absolute",
+
+          left: "50%",
+          bottom: "10%",
+
+          transform: "translateX(-50%)",
+
+          width: "30%",
+          height: "15%",
+
+          background: "transparent",
+
           border: "none",
-          padding: "18px 50px",
-          color: "white",
-          fontSize: "24px",
-          borderRadius: "20px",
+
           cursor: "pointer",
-          boxShadow: "0 0 20px crimson",
         }}
-      >
-        ابدأ
-      </button>
+      />
     </div>
   );
 }
