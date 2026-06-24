@@ -9,8 +9,6 @@ function ZenatyScreen({
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [locked, setLocked] = useState(false);
-
   const availablePlayers = allPlayers.filter(
     (player) => player.playerName !== currentPlayer.playerName,
   );
@@ -22,13 +20,7 @@ function ZenatyScreen({
   */
 
   const choosePlayer = (player) => {
-    if (locked) {
-      return;
-    }
-
     setSelectedPlayer(player.playerName);
-
-    setLocked(true);
 
     const alreadyPlayed = playedPlayers.includes(player.playerName);
 
@@ -82,7 +74,6 @@ function ZenatyScreen({
         {availablePlayers.map((player, index) => (
           <button
             key={index}
-            disabled={locked}
             onClick={() => choosePlayer(player)}
             style={{
               background:
@@ -100,8 +91,7 @@ function ZenatyScreen({
 
               cursor: "pointer",
 
-              opacity:
-                locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+              opacity: 1,
             }}
           >
             {player.zekoMasked ? (

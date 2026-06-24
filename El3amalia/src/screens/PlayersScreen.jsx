@@ -19,9 +19,9 @@ function PlayersScreen({
     const savedPlayers = JSON.parse(localStorage.getItem("lastPlayers"));
 
     if (savedPlayers?.length) {
-      setPlayers(savedPlayers);
+      setPlayers(savedPlayers.slice(0, playerCount));
     }
-  }, []);
+  }, [playerCount]);
 
   return (
     <div

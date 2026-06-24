@@ -8,8 +8,6 @@ function ZekoScreen({
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  const [locked, setLocked] = useState(false);
-
   const availablePlayers = allPlayers.filter(
     (player) => player.playerName !== currentPlayer.playerName,
   );
@@ -21,13 +19,7 @@ function ZekoScreen({
   */
 
   const chooseTarget = (player) => {
-    if (locked) {
-      return;
-    }
-
     setSelectedPlayer(player.playerName);
-
-    setLocked(true);
 
     const alreadyPlayed = playedPlayers.includes(player.playerName);
 
@@ -102,7 +94,6 @@ function ZekoScreen({
         {availablePlayers.map((player, index) => (
           <button
             key={index}
-            disabled={locked}
             onClick={() => chooseTarget(player)}
             style={{
               background:
@@ -120,8 +111,7 @@ function ZekoScreen({
 
               cursor: "pointer",
 
-              opacity:
-                locked && selectedPlayer !== player.playerName ? 0.45 : 1,
+              opacity: 1,
             }}
           >
             {player.playerName}

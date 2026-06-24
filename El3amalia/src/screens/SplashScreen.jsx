@@ -15,7 +15,7 @@ function SplashScreen({ goToSettings }) {
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "cover",
+          objectFit: "contain",
         }}
       />
 
