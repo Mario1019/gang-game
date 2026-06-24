@@ -10,7 +10,7 @@ function SplashScreen({ goToSettings }) {
       }}
     >
       <img
-        src="/Images/splash-screen.png"
+        src="/Images/تصميم بدون عنوان (25).png"
         alt="Splash"
         style={{
           width: "100%",
